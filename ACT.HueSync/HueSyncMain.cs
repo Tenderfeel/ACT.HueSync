@@ -21,6 +21,8 @@ namespace ACT.HueSync
         readonly ListBox log; // for log display
         readonly OverlayForm overlay; // overlay window
 
+        readonly Eorzea.Clock eorzeaClock;
+
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
         TabPage pluginScreen; 
 
@@ -37,6 +39,8 @@ namespace ACT.HueSync
             // Overlay Mini Window
             overlay = new OverlayForm();
             overlay.Controls.Add(log);
+
+            eorzeaClock = new Eorzea.Clock();
         }
 
         /// <summary>
@@ -60,10 +64,12 @@ namespace ACT.HueSync
             // Every time a log line is read
             ActGlobals.oFormActMain.BeforeLogLineRead += OnBeforeLogLineRead;
 
-            // 起動時のゾーンを得る
-            Log(ActGlobals.oFormActMain.CurrentZone);
-
             Log("Plugin Started.");
+
+            // 起動時のゾーンを得る
+            string currentET = eorzeaClock.GetCurrentET(ActGlobals.oFormActMain.LastKnownTime);
+            Log(ActGlobals.oFormActMain.CurrentZone + currentET);
+
         }
 
         public void DeInit()
@@ -78,15 +84,17 @@ namespace ACT.HueSync
         private void OnBeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
         {
 
-            var log = logInfo.logLine; // The full log line
-            var zone = logInfo.detectedZone;
-            var type = logInfo.detectedType;
-            var time = logInfo.detectedTime;
+            string zone = logInfo.detectedZone;
+            int type = logInfo.detectedType;
+            DateTime time = logInfo.detectedTime;
 
             // 40:ChangeMap 
-            if (type == 40 || type == 1)
+            if (type == 40)
             {
-                Log(log + " --[zone]: " + zone + " --[type]: " + type + " --[time]: " + time);
+
+                string currentET = eorzeaClock.GetCurrentET(time);
+
+                Log($"[zone]: {zone} {currentET}");
             }
         }
 
