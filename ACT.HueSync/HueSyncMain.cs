@@ -20,9 +20,12 @@ namespace ACT.HueSync
         readonly ConfigForm configForm;
         readonly ListBox log; // for log display
         readonly OverlayForm overlay; // overlay window
+        readonly Label infoBox; // for info display
 
         readonly Eorzea.Clock eorzeaClock;
         readonly Eorzea.Weather eorzeaWeather;
+
+        System.Timers.Timer timer; // info display timer
 
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
         TabPage pluginScreen; 
@@ -39,13 +42,30 @@ namespace ACT.HueSync
                 Dock = DockStyle.Bottom,
                 Height = 250
             };
-
+            
             // Overlay Mini Window
             overlay = new OverlayForm();
             overlay.Controls.Add(log);
+            infoBox = overlay.InfoBox;
 
             eorzeaClock = new Eorzea.Clock(); 
             eorzeaWeather = new Eorzea.Weather();
+
+            timer = new System.Timers.Timer
+            {
+                Interval = 1000
+            };
+            timer.Elapsed += (o, e) =>
+            {
+                try
+                {
+                    DisplayUpdate();
+                }
+                catch (Exception ex)
+                {
+                    Log("Error: Update: {0}", ex.ToString());
+                }
+            };
         }
 
         /// <summary>
@@ -78,9 +98,7 @@ namespace ACT.HueSync
             
             Log($"{ActGlobals.oFormActMain.CurrentZone} {currentET} -- {currentWeather}");
 
-
-
-            
+            timer.Start();
         }
         /// <summary>
         /// プラグインが無効化されるときにDeInitPluginから呼び出される
@@ -89,9 +107,20 @@ namespace ACT.HueSync
         {
             SaveSettings();
             overlay.Close();
+            timer.Stop();
 
             // Unsubscribe
             ActGlobals.oFormActMain.BeforeLogLineRead -= OnBeforeLogLineRead;
+        }
+
+        private void DisplayUpdate()
+        {
+            string zone = ActGlobals.oFormActMain.CurrentZone;
+            DateTime time = ActGlobals.oFormActMain.LastKnownTime;
+            string currentET = eorzeaClock.GetCurrentET(time);
+            string currentWeather = eorzeaWeather.GetWeather(zone);
+
+            Info($"{zone} {currentET} -- {currentWeather}");
         }
 
         /// <summary>
@@ -115,7 +144,7 @@ namespace ACT.HueSync
                 // エオルゼア天気
                 string currentWeather = eorzeaWeather.GetWeather(zone);
 
-                Log($"{zone} {currentET} -- {currentWeather}");
+                Log($"[ChangeMap] {zone} {currentET} -- {currentWeather}");
             }
         }
 
@@ -127,6 +156,15 @@ namespace ACT.HueSync
             log.Items.Add(DateTime.Now.ToString() + " | " + string.Format(format, args));
         }
 
+        /// <summary>
+        /// Update to the InfoBox Text
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="args"></param>
+        private void Info(string format, params object[] args)
+        {
+            infoBox.Text = string.Format(format, args);
+        }
 
         /// <summary>
         /// プラグイン設定をロードする

@@ -28,20 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.InfoBox = new System.Windows.Forms.Label();
             this.SuspendLayout();
+            // 
+            // InfoBox
+            // 
+            this.InfoBox.AutoSize = true;
+            this.InfoBox.Location = new System.Drawing.Point(13, 13);
+            this.InfoBox.Name = "InfoBox";
+            this.InfoBox.Size = new System.Drawing.Size(44, 12);
+            this.InfoBox.TabIndex = 0;
+            this.InfoBox.Text = "No Info.";
             // 
             // OverlayForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(497, 351);
+            this.ClientSize = new System.Drawing.Size(387, 283);
+            this.Controls.Add(this.InfoBox);
             this.Name = "OverlayForm";
             this.Text = "HueSync";
             this.TopMost = true;
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
+
+        internal System.Windows.Forms.Label InfoBox;
     }
 }
