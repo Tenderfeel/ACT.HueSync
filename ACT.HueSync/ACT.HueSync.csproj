@@ -47,7 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActPlugin.cs" />
+    <Compile Include="Eorzea\Constants.cs" />
     <Compile Include="Eorzea\Clock.cs" />
+    <Compile Include="Eorzea\Locales.cs" />
+    <Compile Include="Eorzea\Weather.cs" />
+    <Compile Include="Eorzea\WeatherChance.cs" />
     <Compile Include="OverlayForm.cs">
       <SubType>Form</SubType>
     </Compile>

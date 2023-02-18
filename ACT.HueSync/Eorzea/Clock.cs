@@ -53,7 +53,7 @@ namespace Eorzea
         }
 
         /// <summary>
-        /// クラス内で保持しているローカル時間を基準にして計算する
+        /// クラス内で保持しているUNIX時間を基準にして計算する
         /// </summary>
         /// <returns>hour:min</returns>
         public string GetLocalbaseET()
@@ -61,26 +61,35 @@ namespace Eorzea
             long hour = (EORZEA_MILLISECONDS / MILLISECONDS_PER_HOUR) % HOURS_PER_DATE;
             long min = (EORZEA_MILLISECONDS / MILLISECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
 
-            return "[ET]" + hour + ":" + min;
+            return $"[ET] {hour}:{min}";
+        }
+
+        /// <summary>
+        /// ローカルタイムゾーンの時間をUnixタイムスタンプに変換する
+        /// </summary>
+        /// <param name="currentLocalTime">基準にするローカル時間</param>
+        /// <returns></returns>
+        public long ConvertUnixTimestamp(DateTime currentLocalTime)
+        {
+            // @see https://yukimemo.hatenadiary.jp/entry/2014/05/24/005417
+            DateTime UNIX_EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc); // UNIXエポックのUTC時刻
+            return (long)(currentLocalTime.ToUniversalTime() - UNIX_EPOCH).TotalMilliseconds; // 経過時間を計算
         }
 
         /// <summary>
         /// パラメーターで渡されたDateTimeを基準にして計算する
         /// </summary>
-        /// <param name="currentLocalTime">基準にする時間</param>
+        /// <param name="currentLocalTime">基準にするローカル時間</param>
         /// <returns>hour:min</returns>
         public string GetCurrentET(DateTime currentLocalTime)
         {
 
-            // @see https://yukimemo.hatenadiary.jp/entry/2014/05/24/005417
-            DateTime UNIX_EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            double nowTicks = (currentLocalTime.ToUniversalTime() - UNIX_EPOCH).TotalMilliseconds;
-            double unixTimestamp = nowTicks * EORZEA_PER_LOCAL;
+            double unixTimestamp = ConvertUnixTimestamp(currentLocalTime) * EORZEA_PER_LOCAL;
 
             double hour2 = Math.Floor(unixTimestamp / MILLISECONDS_PER_HOUR) % HOURS_PER_DATE;
             double min2 = Math.Floor(unixTimestamp / MILLISECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
 
-            return "[ET]" + hour2 + ":" + min2;
+            return $"[ET] {hour2}:{min2}";
         }
     }
 }

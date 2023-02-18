@@ -22,10 +22,14 @@ namespace ACT.HueSync
         readonly OverlayForm overlay; // overlay window
 
         readonly Eorzea.Clock eorzeaClock;
+        readonly Eorzea.Weather eorzeaWeather;
 
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
         TabPage pluginScreen; 
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public HueSyncMain() {
             configForm = new ConfigForm();
 
@@ -40,7 +44,8 @@ namespace ACT.HueSync
             overlay = new OverlayForm();
             overlay.Controls.Add(log);
 
-            eorzeaClock = new Eorzea.Clock();
+            eorzeaClock = new Eorzea.Clock(); 
+            eorzeaWeather = new Eorzea.Weather();
         }
 
         /// <summary>
@@ -66,12 +71,20 @@ namespace ACT.HueSync
 
             Log("Plugin Started.");
 
-            // 起動時のゾーンを得る
+            // 起動時のエオルゼア時間を得る
             string currentET = eorzeaClock.GetCurrentET(ActGlobals.oFormActMain.LastKnownTime);
-            Log(ActGlobals.oFormActMain.CurrentZone + currentET);
+            // 起動時のエオルゼア天気を得る
+            string currentWeather = eorzeaWeather.GetWeather(ActGlobals.oFormActMain.CurrentZone);
+            
+            Log($"{ActGlobals.oFormActMain.CurrentZone} {currentET} -- {currentWeather}");
 
+
+
+            
         }
-
+        /// <summary>
+        /// プラグインが無効化されるときにDeInitPluginから呼び出される
+        /// </summary>
         public void DeInit()
         {
             SaveSettings();
@@ -81,6 +94,11 @@ namespace ACT.HueSync
             ActGlobals.oFormActMain.BeforeLogLineRead -= OnBeforeLogLineRead;
         }
 
+        /// <summary>
+        /// ログが読み込まれる前に実行されるイベントハンドラ
+        /// </summary>
+        /// <param name="isImport"></param>
+        /// <param name="logInfo"></param>
         private void OnBeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
         {
 
@@ -91,10 +109,13 @@ namespace ACT.HueSync
             // 40:ChangeMap 
             if (type == 40)
             {
-
+                // エオルゼア時間
                 string currentET = eorzeaClock.GetCurrentET(time);
 
-                Log($"[zone]: {zone} {currentET}");
+                // エオルゼア天気
+                string currentWeather = eorzeaWeather.GetWeather(zone);
+
+                Log($"{zone} {currentET} -- {currentWeather}");
             }
         }
 
