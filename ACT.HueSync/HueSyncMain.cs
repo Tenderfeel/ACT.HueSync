@@ -172,7 +172,9 @@ namespace ACT.HueSync
         private void LoadSettings()
         {
             // Add any controls you want to save the state of
-            xmlSettings.AddControlSetting(configForm.textBox1.Name, configForm.textBox1);
+            xmlSettings.AddControlSetting(configForm.IpAddress.Name, configForm.IpAddress);
+
+            configForm.SearchInfo.Text = configForm.GetSearchInfoText();
 
             if (File.Exists(settingsFile))
             {
