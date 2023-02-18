@@ -1,6 +1,8 @@
 ﻿using Advanced_Combat_Tracker;
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -14,7 +16,9 @@ namespace ACT.HueSync
 
         readonly HueSyncMain hueSyncMain;
 
-       public ActPlugin ()
+        string pluginDirectory;
+
+        public ActPlugin ()
         {
             hueSyncMain = new HueSyncMain();
         }
@@ -27,6 +31,13 @@ namespace ACT.HueSync
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
         {
             lblStatus = pluginStatusText;   // Hand the status label's reference to our local var
+
+            // get the working directory of the plugin
+            // https://github.com/lonk44/ffxiv_act_discord/blob/master/FFXIV_Discord/PluginLoader.cs
+            var plugin = ActGlobals.oFormActMain.ActPlugins.Where(x => x.pluginObj == this).FirstOrDefault();
+            pluginDirectory = (plugin != null) ? Path.GetDirectoryName(plugin.pluginFile.FullName) : throw new Exception();
+
+            AppDomain.CurrentDomain.AssemblyResolve += Resolver;
 
             hueSyncMain.Init( pluginScreenSpace, pluginStatusText);
 
@@ -41,6 +52,24 @@ namespace ACT.HueSync
             hueSyncMain.DeInit();
 
             lblStatus.Text = "Plugin Exited";
+        }
+
+        public Assembly Resolver(object sender, ResolveEventArgs args)
+        {
+            var asmName = new AssemblyName(args.Name).Name;
+
+            if (!asmName.EndsWith(".dll"))
+            {
+                asmName += ".dll";
+            }
+
+            var asmPath = Path.Combine(pluginDirectory, asmName);
+            if (File.Exists(asmPath))
+            {
+                return Assembly.LoadFile(asmPath);
+            }
+
+            return null;
         }
 
     }

@@ -30,6 +30,8 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.SearchHueBtn = new System.Windows.Forms.Button();
+            this.SearchInfo = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -48,10 +50,31 @@
             this.textBox1.Size = new System.Drawing.Size(100, 19);
             this.textBox1.TabIndex = 1;
             // 
+            // SearchHueBtn
+            // 
+            this.SearchHueBtn.Location = new System.Drawing.Point(216, 22);
+            this.SearchHueBtn.Name = "SearchHueBtn";
+            this.SearchHueBtn.Size = new System.Drawing.Size(143, 23);
+            this.SearchHueBtn.TabIndex = 2;
+            this.SearchHueBtn.Text = "Search Hue Bridge";
+            this.SearchHueBtn.UseVisualStyleBackColor = true;
+            this.SearchHueBtn.Click += new System.EventHandler(this.SearchHueBtn_Click);
+            // 
+            // SearchInfo
+            // 
+            this.SearchInfo.AutoSize = true;
+            this.SearchInfo.Location = new System.Drawing.Point(214, 62);
+            this.SearchInfo.Name = "SearchInfo";
+            this.SearchInfo.Size = new System.Drawing.Size(39, 12);
+            this.SearchInfo.TabIndex = 3;
+            this.SearchInfo.Text = "Ready.";
+            // 
             // ConfigForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.SearchInfo);
+            this.Controls.Add(this.SearchHueBtn);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
             this.Name = "ConfigForm";
@@ -65,5 +88,7 @@
 
         private System.Windows.Forms.Label label1;
         internal System.Windows.Forms.TextBox textBox1;
+        internal System.Windows.Forms.Button SearchHueBtn;
+        internal System.Windows.Forms.Label SearchInfo;
     }
 }
