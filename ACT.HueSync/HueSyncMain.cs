@@ -1,12 +1,8 @@
 ﻿using Advanced_Combat_Tracker;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml;
 
 namespace ACT.HueSync
@@ -15,9 +11,9 @@ namespace ACT.HueSync
     {
         private readonly string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\ActHueSync.config.xml");
 
-        SettingsSerializer xmlSettings;
+        private SettingsSerializer xmlSettings;
 
-        readonly ConfigForm configForm;
+        ConfigForm configForm;
         readonly ListBox log; // for log display
         readonly OverlayForm overlay; // overlay window
         readonly Label infoBox; // for info display
@@ -25,16 +21,15 @@ namespace ACT.HueSync
         readonly Eorzea.Clock eorzeaClock;
         readonly Eorzea.Weather eorzeaWeather;
 
-        System.Timers.Timer timer; // info display timer
+        readonly private System.Timers.Timer timer; // info display timer
 
-        Label lblStatus;    // The status label that appears in ACT's Plugin tab
-        TabPage pluginScreen; 
+        private Label lblStatus;    // The status label that appears in ACT's Plugin tab
+        private TabPage pluginScreen; 
 
         /// <summary>
         /// Constructor
         /// </summary>
         public HueSyncMain() {
-            configForm = new ConfigForm();
 
             // List box for log display
             log = new ListBox
@@ -69,19 +64,23 @@ namespace ACT.HueSync
         }
 
         /// <summary>
-        /// プラグインが有効化されたときにInitPluginから呼び出される
+        /// Called by InitPlugin when the plugin is activated
         /// </summary>
-        /// <param name="pluginScreenSpace">プラグインのタブページ</param>
-        /// <param name="pluginStatusText">プラグインのステータステキスト</param>
+        /// <param name="pluginScreenSpace">Plugin setting tab page</param>
+        /// <param name="pluginStatusText">Plugin status text</param>
         public void Init(TabPage pluginScreenSpace, Label pluginStatusText)
         {
             lblStatus = pluginStatusText;
             pluginScreen = pluginScreenSpace;
 
             pluginScreen.Text = "HueSync";
+
+            // Config UserControl
+            configForm = new ConfigForm();
             pluginScreen.Controls.Add(configForm);
 
-            xmlSettings = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
+            // Create a new settings serializer and pass it this instance
+            xmlSettings = new SettingsSerializer(this);
             LoadSettings();
 
             overlay.Show();
@@ -91,9 +90,9 @@ namespace ACT.HueSync
 
             Log("Plugin Started.");
 
-            // 起動時のエオルゼア時間を得る
+            // Eorzea time at startup
             string currentET = eorzeaClock.GetCurrentET(ActGlobals.oFormActMain.LastKnownTime);
-            // 起動時のエオルゼア天気を得る
+            // Eorzea weather at startup
             string currentWeather = eorzeaWeather.GetWeather(ActGlobals.oFormActMain.CurrentZone);
             
             Log($"{ActGlobals.oFormActMain.CurrentZone} {currentET} -- {currentWeather}");
@@ -101,7 +100,7 @@ namespace ACT.HueSync
             timer.Start();
         }
         /// <summary>
-        /// プラグインが無効化されるときにDeInitPluginから呼び出される
+        /// Called by DeInitPlugin when the plugin is deactivated
         /// </summary>
         public void DeInit()
         {
@@ -124,7 +123,7 @@ namespace ACT.HueSync
         }
 
         /// <summary>
-        /// ログが読み込まれる前に実行されるイベントハンドラ
+        /// Event handler to be executed before the ACT log is read
         /// </summary>
         /// <param name="isImport"></param>
         /// <param name="logInfo"></param>
@@ -138,10 +137,10 @@ namespace ACT.HueSync
             // 40:ChangeMap 
             if (type == 40)
             {
-                // エオルゼア時間
+                // Eorzea time
                 string currentET = eorzeaClock.GetCurrentET(time);
 
-                // エオルゼア天気
+                // Eorzea weather
                 string currentWeather = eorzeaWeather.GetWeather(zone);
 
                 Log($"[ChangeMap] {zone} {currentET} -- {currentWeather}");
@@ -167,7 +166,7 @@ namespace ACT.HueSync
         }
 
         /// <summary>
-        /// プラグイン設定をロードする
+        /// Load plugin settings
         /// </summary>
         private void LoadSettings()
         {
@@ -203,7 +202,7 @@ namespace ACT.HueSync
         }
 
         /// <summary>
-        /// プラグイン設定を保存する
+        /// Save plugin settings
         /// </summary>
         private void SaveSettings()
         {

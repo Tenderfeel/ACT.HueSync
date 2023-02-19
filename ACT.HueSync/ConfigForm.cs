@@ -44,7 +44,7 @@ namespace ACT.HueSync
         {
             SearchInfo.Text = "Searching...";
 
-            var response = await hueController.SearchHueBridge();
+            var response = await hueController.SearchHueBridgeMdns();
 
             hueBridges = response;
 
@@ -65,8 +65,12 @@ namespace ACT.HueSync
         private void SearchResultList_SelectedIndexChanged(object sender, EventArgs e)
         {
             var index = SearchResultList.SelectedIndex;
-            var item = hueBridges[index];
-            IpAddress.Text = item.IpAddress;
+            if(index != -1)
+            {
+                var item = hueBridges[index];
+                IpAddress.Text = item.IpAddress;
+
+            }
         }
     }
 }
