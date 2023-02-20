@@ -40,6 +40,11 @@ namespace ACT.HueSync
             }
         }
 
+        /// <summary>
+        /// Search Hue Bridge Button ClickEvent Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void SearchHueBtn_Click(object sender, EventArgs e)
         {
             SearchInfo.Text = "Searching...";
@@ -62,11 +67,43 @@ namespace ACT.HueSync
             }
         }
 
+        /// <summary>
+        /// Hue Bridge SearchResultList SelectedIndexChanged Event Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SearchResultList_SelectedIndexChanged(object sender, EventArgs e)
         {
             var index = SearchResultList.SelectedIndex;
             var item = hueBridges[index];
             IpAddress.Text = item.IpAddress;
+        }
+        
+        /// <summary>
+        /// RegistHueBtn ClickEvent Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void RegistHueBtn_Click(object sender, EventArgs e)
+        {
+            if (IpAddress.Text == null)
+            {
+                RegistInfo.Text = "IP address is not set.";
+                return;
+            }
+
+            RegistInfo.Text = "Wait...";
+
+            var response = await hueController.RegistApp(IpAddress.Text);
+
+            if (response == null)
+            {
+                SearchInfo.Text = "Error!";
+                return;
+            }
+
+
+            RegistInfo.Text = response.ToString();
         }
     }
 }

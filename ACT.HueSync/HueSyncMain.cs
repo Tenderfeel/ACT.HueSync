@@ -176,6 +176,7 @@ namespace ACT.HueSync
 
             configForm.SearchInfo.Text = configForm.GetSearchInfoText();
 
+
             if (File.Exists(settingsFile))
             {
                 FileStream fs = new FileStream(settingsFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
