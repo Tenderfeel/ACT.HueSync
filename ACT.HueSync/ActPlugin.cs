@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -14,7 +15,7 @@ namespace ACT.HueSync
 
         private Label lblStatus;    // The status label that appears in ACT's Plugin tab
 
-        private HueSyncMain hueSyncMain;
+        private object hueSyncMain;
 
         private string pluginDirectory;
 
@@ -35,11 +36,16 @@ namespace ACT.HueSync
 
             AppDomain.CurrentDomain.AssemblyResolve += Resolver;
 
-            hueSyncMain = new HueSyncMain();
-
-            hueSyncMain.Init(pluginScreenSpace, pluginStatusText);
+            FinalInit(pluginScreenSpace, pluginStatusText);
 
             lblStatus.Text = "Plugin Started";
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void FinalInit(TabPage pluginScreenSpace, Label pluginStatusText)
+        {
+            hueSyncMain = new HueSyncMain();
+           ((HueSyncMain)hueSyncMain).Init(pluginScreenSpace, pluginStatusText);
         }
 
         /// <summary>
@@ -47,7 +53,7 @@ namespace ACT.HueSync
         /// </summary>
         public void DeInitPlugin()
         {
-            hueSyncMain.DeInit();
+            ((HueSyncMain)hueSyncMain).DeInit();
 
             lblStatus.Text = "Plugin Exited";
         }
