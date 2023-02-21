@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml;
+using ACT.HueSync.Config;
 
 namespace ACT.HueSync
 {
@@ -17,24 +18,26 @@ namespace ACT.HueSync
 
         SettingsSerializer xmlSettings;
 
-        readonly ConfigForm configForm;
         readonly ListBox log; // for log display
         readonly OverlayForm overlay; // overlay window
         readonly Label infoBox; // for info display
 
+        readonly Config.ConfigController configController;
+
         readonly Eorzea.Clock eorzeaClock;
         readonly Eorzea.Weather eorzeaWeather;
 
-        System.Timers.Timer timer; // info display timer
+        readonly System.Timers.Timer timer; // info display timer
 
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
-        TabPage pluginScreen; 
+        TabPage pluginScreen;
+        readonly private string _pluginDirectory;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public HueSyncMain() {
-            configForm = new ConfigForm();
+        public HueSyncMain(string pluginDirectory) {
+            _pluginDirectory = pluginDirectory;
 
             // List box for log display
             log = new ListBox
@@ -66,6 +69,8 @@ namespace ACT.HueSync
                     Log("Error: Update: {0}", ex.ToString());
                 }
             };
+
+            configController = new Config.ConfigController(pluginDirectory);
         }
 
         /// <summary>
@@ -79,7 +84,6 @@ namespace ACT.HueSync
             pluginScreen = pluginScreenSpace;
 
             pluginScreen.Text = "HueSync";
-            pluginScreen.Controls.Add(configForm);
 
             xmlSettings = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
             LoadSettings();
@@ -88,6 +92,8 @@ namespace ACT.HueSync
 
             // Every time a log line is read
             ActGlobals.oFormActMain.BeforeLogLineRead += OnBeforeLogLineRead;
+
+            configController.AddPluginControls(pluginScreenSpace);
 
             Log("Plugin Started.");
 
@@ -171,11 +177,7 @@ namespace ACT.HueSync
         /// </summary>
         private void LoadSettings()
         {
-            // Add any controls you want to save the state of
-            xmlSettings.AddControlSetting(configForm.IpAddress.Name, configForm.IpAddress);
-
-            configForm.SearchInfo.Text = configForm.GetSearchInfoText();
-
+            configController.AddControlSetting(xmlSettings);
 
             if (File.Exists(settingsFile))
             {

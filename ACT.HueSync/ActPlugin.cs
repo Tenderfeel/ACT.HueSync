@@ -14,13 +14,12 @@ namespace ACT.HueSync
 
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
 
-        readonly HueSyncMain hueSyncMain;
+        HueSyncMain hueSyncMain;
 
         string pluginDirectory;
 
         public ActPlugin ()
         {
-            hueSyncMain = new HueSyncMain();
         }
 
         /// <summary>
@@ -39,7 +38,8 @@ namespace ACT.HueSync
 
             AppDomain.CurrentDomain.AssemblyResolve += Resolver;
 
-            hueSyncMain.Init( pluginScreenSpace, pluginStatusText);
+            hueSyncMain = new HueSyncMain(pluginDirectory);
+            hueSyncMain.Init( pluginScreenSpace, pluginStatusText );
 
             lblStatus.Text = "Plugin Started";
         }

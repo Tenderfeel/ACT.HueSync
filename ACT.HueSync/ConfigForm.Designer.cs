@@ -38,10 +38,13 @@
             this.label2 = new System.Windows.Forms.Label();
             this.HueAppKey = new System.Windows.Forms.TextBox();
             this.step2Group = new System.Windows.Forms.GroupBox();
+            this.ReClickLabel = new System.Windows.Forms.Label();
+            this.RegistInfo = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.step1Group = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.RegistInfo = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.BridgeId = new System.Windows.Forms.TextBox();
             this.step2Group.SuspendLayout();
             this.step1Group.SuspendLayout();
             this.SuspendLayout();
@@ -49,7 +52,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 50);
+            this.label1.Location = new System.Drawing.Point(13, 80);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(124, 12);
             this.label1.TabIndex = 0;
@@ -57,7 +60,7 @@
             // 
             // IpAddress
             // 
-            this.IpAddress.Location = new System.Drawing.Point(139, 47);
+            this.IpAddress.Location = new System.Drawing.Point(143, 77);
             this.IpAddress.Name = "IpAddress";
             this.IpAddress.Size = new System.Drawing.Size(201, 19);
             this.IpAddress.TabIndex = 1;
@@ -65,7 +68,7 @@
             // 
             // SearchHueBtn
             // 
-            this.SearchHueBtn.Location = new System.Drawing.Point(6, 81);
+            this.SearchHueBtn.Location = new System.Drawing.Point(5, 108);
             this.SearchHueBtn.Name = "SearchHueBtn";
             this.SearchHueBtn.Size = new System.Drawing.Size(143, 23);
             this.SearchHueBtn.TabIndex = 2;
@@ -76,7 +79,7 @@
             // SearchInfo
             // 
             this.SearchInfo.AutoSize = true;
-            this.SearchInfo.Location = new System.Drawing.Point(155, 86);
+            this.SearchInfo.Location = new System.Drawing.Point(154, 113);
             this.SearchInfo.Name = "SearchInfo";
             this.SearchInfo.Size = new System.Drawing.Size(39, 12);
             this.SearchInfo.TabIndex = 3;
@@ -87,9 +90,9 @@
             this.SearchResultList.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.SearchResultList.FormattingEnabled = true;
             this.SearchResultList.ItemHeight = 12;
-            this.SearchResultList.Location = new System.Drawing.Point(3, 110);
+            this.SearchResultList.Location = new System.Drawing.Point(3, 146);
             this.SearchResultList.Name = "SearchResultList";
-            this.SearchResultList.Size = new System.Drawing.Size(396, 148);
+            this.SearchResultList.Size = new System.Drawing.Size(396, 112);
             this.SearchResultList.TabIndex = 4;
             this.SearchResultList.SelectedIndexChanged += new System.EventHandler(this.SearchResultList_SelectedIndexChanged);
             // 
@@ -126,11 +129,12 @@
             this.HueAppKey.Location = new System.Drawing.Point(114, 110);
             this.HueAppKey.Name = "HueAppKey";
             this.HueAppKey.ReadOnly = true;
-            this.HueAppKey.Size = new System.Drawing.Size(201, 19);
+            this.HueAppKey.Size = new System.Drawing.Size(256, 19);
             this.HueAppKey.TabIndex = 10;
             // 
             // step2Group
             // 
+            this.step2Group.Controls.Add(this.ReClickLabel);
             this.step2Group.Controls.Add(this.RegistInfo);
             this.step2Group.Controls.Add(this.label4);
             this.step2Group.Controls.Add(this.RegistHueBtn);
@@ -143,8 +147,38 @@
             this.step2Group.TabStop = false;
             this.step2Group.Text = "Step2";
             // 
+            // ReClickLabel
+            // 
+            this.ReClickLabel.AutoSize = true;
+            this.ReClickLabel.Location = new System.Drawing.Point(19, 80);
+            this.ReClickLabel.Name = "ReClickLabel";
+            this.ReClickLabel.Size = new System.Drawing.Size(271, 12);
+            this.ReClickLabel.TabIndex = 13;
+            this.ReClickLabel.Text = "After clicking the link button, click the button again.";
+            this.ReClickLabel.Visible = false;
+            // 
+            // RegistInfo
+            // 
+            this.RegistInfo.AutoSize = true;
+            this.RegistInfo.Location = new System.Drawing.Point(171, 56);
+            this.RegistInfo.Name = "RegistInfo";
+            this.RegistInfo.Size = new System.Drawing.Size(39, 12);
+            this.RegistInfo.TabIndex = 12;
+            this.RegistInfo.Text = "Ready.";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(14, 25);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(325, 12);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "With the IP address selected, click the RegistApp button once.";
+            // 
             // step1Group
             // 
+            this.step1Group.Controls.Add(this.BridgeId);
+            this.step1Group.Controls.Add(this.label5);
             this.step1Group.Controls.Add(this.label3);
             this.step1Group.Controls.Add(this.SearchResultList);
             this.step1Group.Controls.Add(this.SearchHueBtn);
@@ -163,27 +197,25 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(13, 25);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(180, 12);
+            this.label3.Size = new System.Drawing.Size(217, 12);
             this.label3.TabIndex = 5;
-            this.label3.Text = "Get the IP Address of Hue Bridge.";
+            this.label3.Text = "Get the ID and IP Address of Hue Bridge.";
             // 
-            // label4
+            // label5
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(14, 25);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(325, 12);
-            this.label4.TabIndex = 11;
-            this.label4.Text = "With the IP address selected, click the RegistApp button once.";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(13, 56);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(79, 12);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "Hue Bridge ID:";
             // 
-            // RegistInfo
+            // BridgeId
             // 
-            this.RegistInfo.AutoSize = true;
-            this.RegistInfo.Location = new System.Drawing.Point(171, 56);
-            this.RegistInfo.Name = "RegistInfo";
-            this.RegistInfo.Size = new System.Drawing.Size(39, 12);
-            this.RegistInfo.TabIndex = 12;
-            this.RegistInfo.Text = "Ready.";
+            this.BridgeId.Location = new System.Drawing.Point(143, 50);
+            this.BridgeId.Name = "BridgeId";
+            this.BridgeId.Size = new System.Drawing.Size(201, 19);
+            this.BridgeId.TabIndex = 7;
             // 
             // ConfigForm
             // 
@@ -218,5 +250,8 @@
         protected internal System.Windows.Forms.TextBox HueAppKey;
         private System.Windows.Forms.Label RegistInfo;
         private System.Windows.Forms.Label label4;
+        internal System.Windows.Forms.Label ReClickLabel;
+        private System.Windows.Forms.Label label5;
+        internal System.Windows.Forms.TextBox BridgeId;
     }
 }
