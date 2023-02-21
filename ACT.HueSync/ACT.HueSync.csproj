@@ -78,12 +78,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActPlugin.cs" />
+    <Compile Include="Config\ConfigController.cs" />
     <Compile Include="Eorzea\Constants.cs" />
     <Compile Include="Eorzea\Clock.cs" />
     <Compile Include="Eorzea\Locales.cs" />
     <Compile Include="Eorzea\Weather.cs" />
     <Compile Include="Eorzea\WeatherChance.cs" />
-    <Compile Include="Hue\Controller.cs" />
+    <Compile Include="Hue\HueController.cs" />
     <Compile Include="OverlayForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +99,11 @@
     <Compile Include="ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ConfigForm.resx">
@@ -106,10 +112,15 @@
     <EmbeddedResource Include="OverlayForm.resx">
       <DependentUpon>OverlayForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

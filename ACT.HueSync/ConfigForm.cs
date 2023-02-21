@@ -8,13 +8,18 @@ namespace ACT.HueSync
 {
     public partial class ConfigForm : UserControl
     {
-        readonly Hue.Controller hueController;
+        readonly Hue.HueController hueController;
         private List<Hue.HueBridgeInfo> hueBridges;
+        readonly private string _pluginDirectory;
 
-        public ConfigForm()
+        private bool _linkBtnWaiting = false;
+
+        public ConfigForm(string pluginDirectory)
         {
             InitializeComponent();
-            hueController = new Hue.Controller();
+            _pluginDirectory = pluginDirectory;
+            hueController = new Hue.HueController();
+            ReClickLabel.Visible = false;
         }
 
         private void IpAddress_Change(object sender, EventArgs e)
@@ -40,6 +45,11 @@ namespace ACT.HueSync
             }
         }
 
+        /// <summary>
+        /// Search Hue Bridge Button ClickEvent Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void SearchHueBtn_Click(object sender, EventArgs e)
         {
             SearchInfo.Text = "Searching...";
@@ -62,11 +72,78 @@ namespace ACT.HueSync
             }
         }
 
+        /// <summary>
+        /// Hue Bridge SearchResultList SelectedIndexChanged Event Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SearchResultList_SelectedIndexChanged(object sender, EventArgs e)
         {
             var index = SearchResultList.SelectedIndex;
             var item = hueBridges[index];
-            IpAddress.Text = item.IpAddress;
+            if (item != null)
+            {
+                BridgeId.Text = item.ID;
+                IpAddress.Text = item.IpAddress;
+            }
+        }
+        
+        /// <summary>
+        /// RegistHueBtn ClickEvent Handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void RegistHueBtn_Click(object sender, EventArgs e)
+        {
+            if (IpAddress.Text == null)
+            {
+                RegistInfo.Text = "IP address is not set.";
+                return;
+            }
+
+            if (BridgeId.Text == null)
+            {
+                RegistInfo.Text = "Bridge ID is not set.";
+            }
+
+            if (_linkBtnWaiting == true)
+            {
+                _linkBtnWaiting = false;
+                ReClickLabel.Visible = false;
+            }
+
+            RegistInfo.Text = "Wait...";
+
+            var response = await hueController.RegistApp(BridgeId.Text, IpAddress.Text);
+
+            if (response == null)
+            {
+                RegistInfo.Text = "Error!";
+                return;
+            }
+
+            if (response.Type == "error")
+            {
+                switch (response.Message)
+                {
+                    case "LINK_BUTTON_PRESS":
+                        RegistInfo.Text = "Press the Hue Bridge link button.";
+                        _linkBtnWaiting = true;
+                        ReClickLabel.Visible = true;
+                        break;
+
+                    default:
+                        RegistInfo.Text = $"{response.Type} {response.Message}";
+                        break;
+                }
+            }
+
+            if (response.Type == "success")
+            {
+                RegistInfo.Text = "App registration is complete!";
+                HueAppKey.Text = response.Message;
+            }
+            
         }
     }
 }

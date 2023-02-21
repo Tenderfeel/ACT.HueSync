@@ -62,7 +62,7 @@ namespace Eorzea
         /// <returns>WeatherChanceに渡す整数</returns>
         public int CalculateForecastTarget()
         {
-            long unixtime = (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
+            long unixtime = (long)(DateTime.Now.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalSeconds;
             // Get Eorzea hour for weather start
             double bell = (double)unixtime / 175;
 

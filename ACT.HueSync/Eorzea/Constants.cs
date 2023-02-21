@@ -29,8 +29,22 @@ namespace Eorzea
         {
             {"Limsa Lominsa Lower Decks", "LimsaLominsa"},
             {"Limsa Lominsa Upper Decks", "LimsaLominsa"},
+            {"Middle La Noscea", "MiddleLaNoscea" },
+            {"Lower La Noscea", "LowerLaNoscea" },
+            {"Eastern La Noscea", "EasternLaNoscea" },
+            {"Western La Noscea", "WesternLaNoscea" },
+            {"Upper La Noscea", "UpperLaNoscea" },
+            {"Outer La Noscea", "OuterLaNoscea" },
+            {"Wolves' Den Pier", "WolvesDenPier" },
             {"Idyllshire", "Idyllshire"},
-            {"Empyreum", "Empyreum"}
+            {"Empyreum", "Empyreum"},
+            {"ishgard", "Ishgard"},
+            {"New Gridania", "Gridania"},
+            {"Old Gridania", "Gridania"},
+            {"morDhona", "MorDhona" },
+            {"Ul'dah - Steps of Nald", "Uldah" },
+            {"Ul'dah - Steps of Thal", "Uldah" },
         };
+
     }
 }
