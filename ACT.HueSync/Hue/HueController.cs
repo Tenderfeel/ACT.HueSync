@@ -14,60 +14,82 @@ using System.Runtime.InteropServices;
 
 namespace ACT.HueSync.Hue
 {
-    public class HueBridgeInfo
+
+    internal sealed class HueController
     {
-        [JsonPropertyName("id")]
-        public string ID { get; set; }
 
-        [JsonPropertyName("internalipaddress")]
-        public string IpAddress { get; set; }
+        private static HueController instance = null;
+        private static readonly object padlock = new object();
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-    }
+        private string _bridgeId;
+        private string _ipAddress;
+        private string _appKey;
 
-    public class RestError
-    {
-        [JsonPropertyName("type")]
-        public int Type { get; set; }
+        HueController()
+        {
+        }
 
-        [JsonPropertyName("address")]
-        public string Address { get; set; }
+        public static HueController Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new HueController();
+                    }
+                    return instance;
+                }
+            }
+        }
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
-    }
+        public string BridgeId
+        {
+            get { return _bridgeId; }
 
-    public class HueErrorResponse
-    {
-        [JsonPropertyName("error")]
-        public RestError Error { get; set; }
-    }
+            set { _bridgeId = value; }
+        }
 
-    public class RegisterSuccess
-    {
-        [JsonPropertyName("username")]
-        public string Username { get; set; }
-    }
+        public string IpAddress
+        {
+            get { return _ipAddress; }
+            set { _ipAddress = value; }
+        }
 
-    public class RegisterResponse
-    {
-        [JsonPropertyName("error")]
-        public RestError Error { get; set; }
+        public string AppKey
+        {
+            get { return _appKey; }
+            set { _appKey = value; }   
+        }
 
-        [JsonPropertyName("success")]
-        public RegisterSuccess Success { get; set; }
-    }
+        /// <summary>
+        /// Bridgeに接続されている全ての照明機器を返す
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Dictionary<string, HueLight>> GetAllLights()
+        {
+            ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetAllLights!");
 
+            try
+            {
+                var client = RestClientFactory();
+                var request = new RestRequest($"/api/{_appKey}/lights", Method.Get);
+                var responses = await client.GetAsync<Dictionary<string, HueLight>>(request);
 
-    public class RegisterResult
-    {
-        public string Type { get; set; }
-        public string Message { get; set; }
-    }
+                if (responses.Count == 0)
+                {
+                    return null;
+                }
+                return responses;
 
-    internal class HueController
-    {
+            } catch(Exception ex)
+            {
+                ActGlobals.oFormActMain.WriteExceptionLog(ex, ex.Message);
+                return null;
+            }
+        }
+        
         public async Task<List<HueBridgeInfo>> SearchHueBridge()
         {
 
@@ -78,6 +100,7 @@ namespace ACT.HueSync.Hue
                 var client = new RestClient("https://discovery.meethue.com");
                 var request = new RestRequest("/");
                 var result = await client.GetAsync<List<HueBridgeInfo>>(request);
+
                 return result;
             }
             catch (Exception ex)
@@ -87,32 +110,44 @@ namespace ACT.HueSync.Hue
             }
         }
 
-        public async Task<RegisterResult> RegistApp(string bridgeId, string ipAddress)
+        /// <summary>
+        /// 証明書付きのRestClientを生成する
+        /// </summary>
+        /// <returns></returns>
+        private RestClient RestClientFactory()
         {
-            try
-            {
-                // HueBridgeの証明書を読み込む
-                string huebridgeCacert = Properties.Resources.HuebridgeCacert;
-                byte[] certificateBytes = Encoding.ASCII.GetBytes(huebridgeCacert);
-                X509Certificate2 certificate = new X509Certificate2(certificateBytes);
-                X509Certificate2Collection certificateCollection = new X509Certificate2Collection
+            // HueBridgeの証明書を読み込む
+            string huebridgeCacert = Properties.Resources.HuebridgeCacert;
+            byte[] certificateBytes = Encoding.ASCII.GetBytes(huebridgeCacert);
+            X509Certificate2 certificate = new X509Certificate2(certificateBytes);
+            X509Certificate2Collection certificateCollection = new X509Certificate2Collection
                 {
                     certificate
                 };
 
-
-                var options = new RestClientOptions(new Uri($"https://{ipAddress}"))
+            var options = new RestClientOptions(new Uri($"https://{_ipAddress}"))
+            {
+                ClientCertificates = certificateCollection,
+                RemoteCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
                 {
-                    ClientCertificates = certificateCollection,
-                   RemoteCertificateValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
-                   {
-                       // CN=ecb5fafffe82eea0, O=Philips Hue, C=NL
-                       ActGlobals.oFormActMain.WriteInfoLog($"[RegistApp response] {cert.Subject}");
-                       return cert.Subject.Contains(bridgeId);
-                   }
-                };
+                    return cert.Subject.Contains(_bridgeId);
+                }
+            };
 
-                var client = new RestClient(options);
+            return new RestClient(options);
+
+        }
+
+        /// <summary>
+        /// Bridgeにアプリを登録する
+        /// </summary>
+        /// <returns></returns>
+        public async Task<RegisterResult> RegistApp()
+        {
+            try
+            {
+
+                var client = RestClientFactory();
 
                 var request = new RestRequest("/api", Method.Post);
                 var param = new { devicetype = $"ActHueSync#{Environment.MachineName}" };

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Xsl;
+using ACT.HueSync.Config.Forms;
 using Advanced_Combat_Tracker;
 
 namespace ACT.HueSync.Config
@@ -12,29 +13,60 @@ namespace ACT.HueSync.Config
     internal class ConfigController
     {
         readonly ConfigForm configForm;
+        readonly HueInitializeForm hueInitializeForm;
+        readonly HueLightsForm hueLightsForm;
 
 
         public ConfigController(string pluginDirectory)
         {
 
-            configForm = new ConfigForm(pluginDirectory);
+            hueInitializeForm = new HueInitializeForm();
+            hueLightsForm = new HueLightsForm();
+            configForm = new ConfigForm();
+
+            configForm.Tree_MainMenu.AfterSelect += Tree_MainMenu_AfterSelect;
         }
 
+        /// <summary>
+        /// Main Menu
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Tree_MainMenu_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            configForm.Panel_Content.Controls.Clear();
+            configForm.Panel_Content.Visible = true;
+
+            switch (configForm.Tree_MainMenu.SelectedNode.Name)
+            {
+                case "Hue_Initialize":
+                    configForm.Panel_Content.Controls.Add(hueInitializeForm);
+                    break;
+
+                case "Hue_Lights":
+                    configForm.Panel_Content.Controls.Add(hueLightsForm);
+                    break;
+
+                default:
+                    configForm.Panel_Content.Visible = false;
+                    break;
+            }
+        }
 
         public void AddPluginControls(TabPage pluginScreenSpace)
         {
+            // ACTプラグインタブパネルに登録
             pluginScreenSpace.Controls.Add(configForm);
         }
 
+        /// <summary>
+        /// サブクラスにSettingsSerializerを渡す
+        /// </summary>
+        /// <param name="xmlSettings"></param>
         public void AddControlSetting(SettingsSerializer xmlSettings)
         {
-            // Add any controls you want to save the state of
-            xmlSettings.AddControlSetting(configForm.BridgeId.Name, configForm.BridgeId);
-            xmlSettings.AddControlSetting(configForm.IpAddress.Name, configForm.IpAddress);
-            xmlSettings.AddControlSetting(configForm.HueAppKey.Name, configForm.HueAppKey);
-
-            configForm.SearchInfo.Text = configForm.GetSearchInfoText();
-
+            hueInitializeForm.AddControlSetting(xmlSettings);
+            hueLightsForm.AddControlSetting(xmlSettings);
         }
     }
 }
