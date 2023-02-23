@@ -17,6 +17,8 @@ namespace ACT.HueSync.Config.Forms
     {
         readonly Hue.HueController hueController;
 
+        private bool _isEmptyConfig;
+
 
         private List<LightConfig> lightConfigs;
 
@@ -36,17 +38,15 @@ namespace ACT.HueSync.Config.Forms
         public void AddControlSetting(SettingsSerializer xmlSettings)
         {
             xmlSettings.AddControlSetting(List_HueLights.Name, List_HueLights);
-
         }
 
 
         private  void HueLightsForm_Load(object sender, EventArgs e)
         {
 
-            if (List_HueLights.Items.Count == 0)
-            {
-                GetHueLights();
-            }
+            _isEmptyConfig = List_HueLights.Items.Count == 0;
+
+            GetHueLights();
 
         }
 
@@ -76,11 +76,13 @@ namespace ACT.HueSync.Config.Forms
 
             Label_GetLightsState.Text = $"{result.Count} found.";
 
-
             lightConfigs = result.Select(kv =>
             {
-                List_HueLights.Items.Add(kv.Value.Name, CheckState.Unchecked);
-
+                if (_isEmptyConfig)
+                {
+                    List_HueLights.Items.Add($"{kv.Value.Name}   ({kv.Value.Uniqueid})", CheckState.Unchecked);
+                }
+                    
                 return new LightConfig()
                 {
                     Enabled = false,
