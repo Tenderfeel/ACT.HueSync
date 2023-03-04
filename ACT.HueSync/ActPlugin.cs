@@ -38,6 +38,8 @@ namespace ACT.HueSync
 
             AppDomain.CurrentDomain.AssemblyResolve += Resolver;
 
+            PluginSetting.Instance.PluginDirectory = pluginDirectory;
+
             hueSyncMain = new HueSyncMain(pluginDirectory);
             hueSyncMain.Init( pluginScreenSpace, pluginStatusText );
 

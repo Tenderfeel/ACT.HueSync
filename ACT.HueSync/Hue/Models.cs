@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
 
@@ -38,6 +39,20 @@ namespace ACT.HueSync.Hue
     {
         [JsonPropertyName("username")]
         public string Username { get; set; }
+    }
+
+    public class PutSuccessResponse
+    {
+        public Dictionary<string, int> Data { get; set; }
+    }
+
+    public class PutResponse
+    {
+        [JsonPropertyName("error")]
+        public RestError Error { get; set; }
+
+        [JsonPropertyName("success")]
+        public PutSuccessResponse Success { get; set; }
     }
 
     public class RegisterResponse
@@ -128,12 +143,17 @@ namespace ACT.HueSync.Hue
         public bool Power { get; set; }
 
         /// <summary>
+        /// デバイスのID（リクエスト時に使う）
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// ユーザーが付けてる名前
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// デバイスのID
+        /// デバイスのMac Address
         /// </summary>
         public string Uniqueid { get; set; }
 
@@ -141,5 +161,20 @@ namespace ACT.HueSync.Hue
         /// 製品名
         /// </summary>
         public string ProductName { get; set; }
+    }
+
+    public class ColorSetting
+    {
+        public string Category { get; set; }
+        public string TimeZone { get; set; }
+        public string Color { get; set; }
+    }
+
+    public class PutLightState
+    {
+        public bool On { get; set; }
+        public float Bri { get; set; }
+        public float Hue { get; set; }
+        public float Sat { get; set; }
     }
 }

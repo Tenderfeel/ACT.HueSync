@@ -1,6 +1,22 @@
-﻿# Amatsumi
+﻿# ACT.HueSync
 
 FF14 ACT Plugin
+
+
+## Weather
+- ET 00:00 ‑ 07:59	
+- ET 08:00 ‑ 15:59
+- ET 16:00 ‑ 23:59
+
+
+## Time Zone
+
+| ID | Time Lange |
+| morning | 6:00 - 12:00 |
+| afternoon | 12:00 - 18:00 |
+| evening | 18:00 - 21:00 |
+| night | 21:00 - 6:00 |
+
 
 ## Log Type List
 
@@ -64,3 +80,10 @@ FF14 ACT Plugin
 | Abyssos: The Eighth Circle (Savage) | 煉獄零式4層（万魔殿）  |
 | Containment Bay P1T6 (Unreal) | 幻女神ソフィア討滅戦 |
 | Euphrosyne | エウプロシュネ |
+| the Fell Court of Troia | トロイアコート |
+| The Copied Factory | 複製サレタ工場 |
+| Sastasha | サスタシャ |
+| the Wanderer's Palace | ワンダラーパレス |
+| Amdapor Keep | 古城アムダプール |
+| the Sirensong Sea |　セイレーン海 |
+| Private Mansion | FCハウス |

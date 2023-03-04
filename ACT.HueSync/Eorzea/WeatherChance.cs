@@ -304,27 +304,33 @@ namespace Eorzea
 
         public static string Empyreum (int chance)
         {
-            if (chance < 30)
-            {
-                return Constants.WEATHER_SNOW;
-            }
-
-            if (chance < 10)
-            {
-                return Constants.WEATHER_FOG;
-            }
-
-            if (chance < 15)
+            if (chance < 5)
             {
                 return Constants.WEATHER_CLOUDS;
             }
 
-            if (chance < 90)
+            if (chance < 20)
             {
                 return Constants.WEATHER_FAIR_SKIES;
             }
 
-            return Constants.WEATHER_FAIR_SKIES;
+            if (chance < 40)
+            {
+                return Constants.WEATHER_FOG;
+            }
+
+            if (chance < 60)
+            {
+                return Constants.WEATHER_FOG;
+            }
+
+
+            if (chance < 90)
+            {
+                return Constants.WEATHER_SNOW;
+            }
+
+            return Constants.WEATHER_CLEAR_SKIES;
 
         }
     }

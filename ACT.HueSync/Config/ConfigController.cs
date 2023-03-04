@@ -15,14 +15,21 @@ namespace ACT.HueSync.Config
         readonly ConfigForm configForm;
         readonly HueInitializeForm hueInitializeForm;
         readonly HueLightsForm hueLightsForm;
+        readonly ConfigIndexForm configIndexForm;
+        readonly LimsaLominsaForm limsaLominsaForm;
+        readonly ColorIndexForm colorIndexForm;
 
 
         public ConfigController(string pluginDirectory)
         {
+            configForm = new ConfigForm();
 
+            configIndexForm = new ConfigIndexForm();
             hueInitializeForm = new HueInitializeForm();
             hueLightsForm = new HueLightsForm();
-            configForm = new ConfigForm();
+            limsaLominsaForm = new LimsaLominsaForm();
+            colorIndexForm= new ColorIndexForm();
+
 
             configForm.Tree_MainMenu.AfterSelect += Tree_MainMenu_AfterSelect;
         }
@@ -39,6 +46,7 @@ namespace ACT.HueSync.Config
 
             switch (configForm.Tree_MainMenu.SelectedNode.Name)
             {
+                case "Hue_Setting":
                 case "Hue_Initialize":
                     configForm.Panel_Content.Controls.Add(hueInitializeForm);
                     break;
@@ -47,8 +55,16 @@ namespace ACT.HueSync.Config
                     configForm.Panel_Content.Controls.Add(hueLightsForm);
                     break;
 
+                case "Color_Setting":
+                case "Color_General":
+                    configForm.Panel_Content.Controls.Add(colorIndexForm);
+                    break;
+
+                case "Color_LimsaLominsa":
+                    configForm.Panel_Content.Controls.Add(limsaLominsaForm);
+                    break;
                 default:
-                    configForm.Panel_Content.Visible = false;
+                    configForm.Panel_Content.Controls.Add(configIndexForm);
                     break;
             }
         }
@@ -67,6 +83,11 @@ namespace ACT.HueSync.Config
         {
             hueInitializeForm.AddControlSetting(xmlSettings);
             hueLightsForm.AddControlSetting(xmlSettings);
+        }
+
+        public void AfterSettingLoaded()
+        {
+            hueLightsForm.AfterSettingLoaded();
         }
     }
 }

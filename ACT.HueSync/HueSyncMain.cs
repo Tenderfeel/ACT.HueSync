@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml;
 using ACT.HueSync.Config;
+using System.Security.Policy;
 
 namespace ACT.HueSync
 {
@@ -31,7 +32,10 @@ namespace ACT.HueSync
 
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
         TabPage pluginScreen;
+
         readonly private string _pluginDirectory;
+
+        readonly Hue.HueController hueController;
 
         /// <summary>
         /// Constructor
@@ -71,6 +75,10 @@ namespace ACT.HueSync
             };
 
             configController = new Config.ConfigController(pluginDirectory);
+
+            hueController = Hue.HueController.Instance;
+            hueController.ConfigLoaded += HandleLightsConfigLoaded;
+
         }
 
         /// <summary>
@@ -98,11 +106,17 @@ namespace ACT.HueSync
             Log("Plugin Started.");
 
             // 起動時のエオルゼア時間を得る
-            string currentET = eorzeaClock.GetCurrentET(ActGlobals.oFormActMain.LastKnownTime);
+            string zone = ActGlobals.oFormActMain.CurrentZone;
+            //var currentET = eorzeaClock.GetCurrentET(ActGlobals.oFormActMain.LastKnownTime);
+            var currentET = eorzeaClock.GetLocalbaseET();
             // 起動時のエオルゼア天気を得る
-            string currentWeather = eorzeaWeather.GetWeather(ActGlobals.oFormActMain.CurrentZone);
-            
-            Log($"{ActGlobals.oFormActMain.CurrentZone} {currentET} -- {currentWeather}");
+            string currentWeather = eorzeaWeather.GetWeather(zone);
+
+            PluginSetting.Instance.CurrentWeather = currentWeather;
+            PluginSetting.Instance.CurrentET= currentET["hour"];
+            PluginSetting.Instance.CurrentZoneName = zone;
+
+            Log($"{zone}  [ET]{currentET["hour"]}:{currentET["min"]} -- {currentWeather}");
 
             timer.Start();
         }
@@ -123,10 +137,14 @@ namespace ACT.HueSync
         {
             string zone = ActGlobals.oFormActMain.CurrentZone;
             DateTime time = ActGlobals.oFormActMain.LastKnownTime;
-            string currentET = eorzeaClock.GetCurrentET(time);
+            var currentET = eorzeaClock.GetCurrentET(time);
             string currentWeather = eorzeaWeather.GetWeather(zone);
 
-            Info($"{zone} {currentET} -- {currentWeather}");
+            PluginSetting.Instance.CurrentWeather = currentWeather;
+            PluginSetting.Instance.CurrentET = currentET["hour"];
+            PluginSetting.Instance.CurrentZoneName = zone;
+
+            Info($"{zone} [ET]{currentET["hour"]}:{currentET["min"]} -- {currentWeather}");
         }
 
         /// <summary>
@@ -145,12 +163,35 @@ namespace ACT.HueSync
             if (type == 40)
             {
                 // エオルゼア時間
-                string currentET = eorzeaClock.GetCurrentET(time);
+                var currentET = eorzeaClock.GetCurrentET(time);
 
                 // エオルゼア天気
                 string currentWeather = eorzeaWeather.GetWeather(zone);
 
-                Log($"[ChangeMap] {zone} {currentET} -- {currentWeather}");
+                PluginSetting.Instance.CurrentWeather = currentWeather;
+                PluginSetting.Instance.CurrentET = currentET["hour"];
+                PluginSetting.Instance.CurrentZoneName = zone;
+
+                Log($"[ChangeMap] {zone}  [ET]{currentET["hour"]}:{currentET["min"]} -- {currentWeather}");
+
+            }
+        }
+
+        /// <summary>
+        /// ライト設定が読み込まれたときの処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void HandleLightsConfigLoaded(object sender, EventArgs e)
+        {
+            try
+            {
+                var param = PluginSetting.Instance.GetLightState();
+                await hueController.SetLightState(param);
+
+            } catch (Exception ex)
+            {
+                ActGlobals.oFormActMain.WriteExceptionLog(ex, ex.Message);
             }
         }
 
@@ -202,6 +243,8 @@ namespace ACT.HueSync
                     lblStatus.Text = "Error loading settings: " + ex.Message;
                 }
                 xReader.Close();
+
+                configController.AfterSettingLoaded();
             }
         }
 

@@ -79,6 +79,18 @@
   <ItemGroup>
     <Compile Include="ActPlugin.cs" />
     <Compile Include="Config\ConfigController.cs" />
+    <Compile Include="Config\Forms\ColorIndexForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\Forms\ColorIndexForm.Designer.cs">
+      <DependentUpon>ColorIndexForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Config\Forms\ConfigIndexForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\Forms\ConfigIndexForm.Designer.cs">
+      <DependentUpon>ConfigIndexForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config\Forms\HueInitializeForm.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -92,9 +104,16 @@
       <DependentUpon>HueLightsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\Forms\IConfigForm.cs" />
+    <Compile Include="Config\Forms\LimsaLominsaForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Config\Forms\LimsaLominsaForm.Designer.cs">
+      <DependentUpon>LimsaLominsaForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Eorzea\Constants.cs" />
     <Compile Include="Eorzea\Clock.cs" />
     <Compile Include="Eorzea\Locales.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="Eorzea\Weather.cs" />
     <Compile Include="Eorzea\WeatherChance.cs" />
     <Compile Include="Hue\HueController.cs" />
@@ -118,16 +137,26 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PluginSetting.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\Forms\ColorIndexForm.resx">
+      <DependentUpon>ColorIndexForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\Forms\ConfigIndexForm.resx">
+      <DependentUpon>ConfigIndexForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\Forms\HueInitializeForm.resx">
       <DependentUpon>HueInitializeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\Forms\HueLightsForm.resx">
       <DependentUpon>HueLightsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Config\Forms\LimsaLominsaForm.resx">
+      <DependentUpon>LimsaLominsaForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OverlayForm.resx">
       <DependentUpon>OverlayForm.cs</DependentUpon>
@@ -141,6 +170,10 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="ColorData\General.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

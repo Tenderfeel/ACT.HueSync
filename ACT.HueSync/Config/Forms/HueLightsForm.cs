@@ -1,11 +1,13 @@
 ﻿using ACT.HueSync.Hue;
 using Advanced_Combat_Tracker;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,7 +22,6 @@ namespace ACT.HueSync.Config.Forms
         private bool _isEmptyConfig;
 
 
-        private List<LightConfig> lightConfigs;
 
         public HueLightsForm()
         {
@@ -40,27 +41,38 @@ namespace ACT.HueSync.Config.Forms
             xmlSettings.AddControlSetting(List_HueLights.Name, List_HueLights);
         }
 
-
-        private  void HueLightsForm_Load(object sender, EventArgs e)
+        public void AfterSettingLoaded()
         {
 
             _isEmptyConfig = List_HueLights.Items.Count == 0;
 
             GetHueLights();
+        }
 
+        private  void HueLightsForm_Load(object sender, EventArgs e)
+        {
+            if (List_HueLights.Items.Count == 0)
+            {
+                GetHueLights();
+            }
         }
 
         private async void GetHueLights()
         {
+            ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetHueLights Called.");
+
             if (hueController.IpAddress == null)
             {
                 Label_GetLightsState.Text = "IP address is not set.";
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetHueLights, IP address is not set.");
                 return;
             }
 
             if (hueController.BridgeId == null)
             {
                 Label_GetLightsState.Text = "Bridge ID is not set.";
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetHueLights, Bridge ID is not set.");
+                return;
             }
 
             Label_GetLightsState.Text = "Loading...";
@@ -70,29 +82,47 @@ namespace ACT.HueSync.Config.Forms
             if (result == null)
             {
                 Label_GetLightsState.Text = "Error!";
-
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetHueLights, result is null.");
                 return;
             }
 
             Label_GetLightsState.Text = $"{result.Count} found.";
 
-            lightConfigs = result.Select(kv =>
+            var lightConfigs = new List<LightConfig>();
+
+            foreach (var item in result)
             {
-                if (_isEmptyConfig)
+                bool isEnabled = false;
+
+                if (!_isEmptyConfig)
                 {
-                    List_HueLights.Items.Add($"{kv.Value.Name}   ({kv.Value.Uniqueid})", CheckState.Unchecked);
+                    var index = List_HueLights.Items.IndexOf($"({item.Key}) {item.Value.Name}");
+                    if (index != -1)
+                    {
+                        isEnabled = List_HueLights.GetItemChecked(index);
+                    }
                 }
-                    
-                return new LightConfig()
+                else
                 {
-                    Enabled = false,
-                    Power = kv.Value.State.On,
-                    Name = kv.Value.Name,
-                    Uniqueid = kv.Value.Uniqueid,
-                    ProductName = kv.Value.Productname
-                };
-            })
-            .ToList();
+                    List_HueLights.Items.Add($"({item.Key}) {item.Value.Name}", CheckState.Unchecked);
+
+                }
+
+                lightConfigs.Add(
+                    new LightConfig()
+                    {
+                        Enabled = isEnabled,
+                        Id = item.Key,
+                        Power = item.Value.State.On,
+                        Name = item.Value.Name,
+                        Uniqueid = item.Value.Uniqueid,
+                        ProductName = item.Value.Productname
+                    }
+                );
+
+            }
+
+            hueController.LightConfigs = lightConfigs;
         }
     }
 }

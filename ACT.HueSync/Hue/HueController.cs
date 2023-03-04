@@ -11,6 +11,7 @@ using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Policy;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace ACT.HueSync.Hue
 {
@@ -21,9 +22,13 @@ namespace ACT.HueSync.Hue
         private static HueController instance = null;
         private static readonly object padlock = new object();
 
+
         private string _bridgeId;
         private string _ipAddress;
         private string _appKey;
+
+        private List<LightConfig> _lightConfigs;
+        public event EventHandler ConfigLoaded;
 
         HueController()
         {
@@ -63,6 +68,16 @@ namespace ACT.HueSync.Hue
             set { _appKey = value; }   
         }
 
+        public List<LightConfig> LightConfigs
+        {
+            get { return _lightConfigs;  }
+            set { _lightConfigs = value;
+
+                ConfigLoaded.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+
         /// <summary>
         /// Bridgeに接続されている全ての照明機器を返す
         /// </summary>
@@ -85,6 +100,51 @@ namespace ACT.HueSync.Hue
 
             } catch(Exception ex)
             {
+                ActGlobals.oFormActMain.WriteExceptionLog(ex, ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<List<PutResponse>[]> SetLightState(object param)
+        {
+            if (_lightConfigs == null || _lightConfigs.Count == 0)
+            {
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] SetLightState: NO Lights Setting");
+                return null;
+            }
+
+            if (param == null)
+            {
+
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] SetLightState: NO Params");
+                return null;
+            }
+
+            try
+            {
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] SetLightState: Request " + param.ToString());
+
+                var client = RestClientFactory();
+
+                var enabledConfigs = _lightConfigs.Where(config => config.Enabled).ToArray();
+
+                var tasks = new Task<List<PutResponse>>[enabledConfigs.Length];
+                
+
+                for (var i = 0; i < enabledConfigs.Length; i++)
+                {
+                    var request = new RestRequest($"/api/{_appKey}/lights/{enabledConfigs[i].Id}/state", Method.Put);
+                    
+                    request.AddJsonBody(param);
+                    tasks[i] = client.PutAsync<List<PutResponse>>(request);
+                }
+
+                return await Task.WhenAll(tasks);
+
+            }
+            catch (Exception ex)
+            {
+
                 ActGlobals.oFormActMain.WriteExceptionLog(ex, ex.Message);
                 return null;
             }

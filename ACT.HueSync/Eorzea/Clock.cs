@@ -56,12 +56,18 @@ namespace Eorzea
         /// クラス内で保持しているUNIX時間を基準にして計算する
         /// </summary>
         /// <returns>hour:min</returns>
-        public string GetLocalbaseET()
+        public Dictionary<string, double> GetLocalbaseET()
         {
             long hour = (EORZEA_MILLISECONDS / MILLISECONDS_PER_HOUR) % HOURS_PER_DATE;
             long min = (EORZEA_MILLISECONDS / MILLISECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
 
-            return $"[ET] {hour}:{min}";
+            var result = new Dictionary<string, double>
+            {
+                { "hour", hour },
+                { "min", min }
+            };
+
+            return result;
         }
 
         /// <summary>
@@ -81,7 +87,7 @@ namespace Eorzea
         /// </summary>
         /// <param name="currentLocalTime">基準にするローカル時間</param>
         /// <returns>hour:min</returns>
-        public string GetCurrentET(DateTime currentLocalTime)
+        public Dictionary<string, double> GetCurrentET(DateTime currentLocalTime)
         {
 
             double unixTimestamp = ConvertUnixTimestamp(currentLocalTime) * EORZEA_PER_LOCAL;
@@ -89,7 +95,13 @@ namespace Eorzea
             double hour2 = Math.Floor(unixTimestamp / MILLISECONDS_PER_HOUR) % HOURS_PER_DATE;
             double min2 = Math.Floor(unixTimestamp / MILLISECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
 
-            return $"[ET] {hour2}:{min2}";
+            var result = new Dictionary<string, double>
+            {
+                { "hour", hour2 },
+                { "min", min2 }
+            };
+
+            return result;
         }
     }
 }
