@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 using ACT.HueSync.Hue;
 using Advanced_Combat_Tracker;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 
 namespace ACT.HueSync.Config.Forms
 {
@@ -30,10 +31,8 @@ namespace ACT.HueSync.Config.Forms
 
             dataSet = new DataSet();
 
-            LoadData();
-
-            DataGrid_ColorSetting.CellClick += DataGrid_ColorSetting_CellClick;
-            //DataGrid_ColorSetting.DataBindingComplete += DataGrid_ColorSetting_DataBindingComplete;
+            // LoadData();
+            // DataGrid_ColorSetting.DataBindingComplete += DataGrid_ColorSetting_DataBindingComplete;
         }
 
         private void DataGrid_ColorSetting_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -41,39 +40,6 @@ namespace ACT.HueSync.Config.Forms
            // SetColorCellBgColor();
         }
 
-        private void DataGrid_ColorSetting_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // クリックされたセルの列と行のインデックスを取得
-            int columnIndex = e.ColumnIndex;
-            int rowIndex = e.RowIndex;
-
-            // クリックされたのがヘッダー行でなく、かつヘッダー名が"Color"の場合のみ処理を実行
-            if (rowIndex >= 0 && columnIndex > 0 && DataGrid_ColorSetting.Columns[columnIndex].HeaderText == "Color")
-            {
-                // カラーピッカーを表示し、ユーザーが選択した色を取得
-                ColorDialog colorDialog = new ColorDialog();
-
-                if (colorDialog.ShowDialog() == DialogResult.OK)
-                {
-                    float red = colorDialog.Color.R;
-                    float green = colorDialog.Color.G;
-                    float blue = colorDialog.Color.B;
-
-                    string colorText = $"{red}, {green}, {blue}";
-
-                    // セルに選択された色を設定
-                    DataGrid_ColorSetting.Rows[rowIndex].Cells[columnIndex].Style.BackColor = colorDialog.Color;
-
-                    DataGrid_ColorSetting.Rows[rowIndex].Cells[columnIndex].Value = colorText;
-
-                    // データセットに保存
-                    dataSet.Tables["ColorSetting"].Rows[rowIndex]["Color"] = colorText;
-
-                    SaveData();
-                }
-            }
-            return;
-        }
 
         private void SaveData ()
         {
@@ -103,11 +69,9 @@ namespace ACT.HueSync.Config.Forms
 
             DataTable table = new DataTable("ColorSetting");
 
-
             table.Columns.Add(new DataColumn("Category", typeof(string)));
             table.Columns.Add(new DataColumn("TimeZone", typeof(string)));
             table.Columns.Add(new DataColumn("Color", typeof(string)));
-
 
 
             string[] timezone =  { "morning", "argernoon", "evening", "night" };
@@ -234,6 +198,17 @@ namespace ACT.HueSync.Config.Forms
                     Name = column.ColumnName,
                     ReadOnly = true
                 };
+                switch (column.ColumnName)
+                {
+                    case "ID":
+                        TextColumn.Width = 50;
+                        break;
+                    case "Name":
+                        break;
+                    default:
+                        TextColumn.Width = 80;
+                        break;
+                }
                 dv.Columns.Add(TextColumn);
             }
 
@@ -260,6 +235,78 @@ namespace ACT.HueSync.Config.Forms
             }
 
             dv.ResumeLayout();
+        }
+
+        /// <summary>
+        /// 現在接続されているライトの設定を得る
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Btn_GetLightState_Click_1(object sender, EventArgs e)
+        {
+
+            Label_GetStateInfo.Text = "Wait...";
+            Panel_Trigger.Visible = false;
+
+            var response = await Hue.HueController.Instance.GetLightState();
+
+            if (response == null)
+            {
+                Label_GetStateInfo.Text = "Error!";
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetLightState, result is null.");
+                return;
+            }
+
+
+            if (response.Count() == 0)
+            {
+                Label_GetStateInfo.Text = $"Not one status was retrieved.";
+                return;
+            }
+
+            Label_GetStateInfo.Text = $"{response.Count()} found";
+
+            Panel_Trigger.Visible = true;
+
+            dataSet.Clear();
+
+            DataTable table = new DataTable("ColorSetting");
+
+            table.Columns.Add(new DataColumn("ID", typeof(string)));
+            table.Columns.Add(new DataColumn("Name", typeof(string)));
+            table.Columns.Add(new DataColumn("ColorMode", typeof(string)));
+            table.Columns.Add(new DataColumn("Bri", typeof(int)));
+            table.Columns.Add(new DataColumn("Hue", typeof(int)));
+            table.Columns.Add(new DataColumn("Sat", typeof(int)));
+            table.Columns.Add(new DataColumn("X", typeof(float)));
+            table.Columns.Add(new DataColumn("Y", typeof(float)));
+            table.Columns.Add(new DataColumn("Ct", typeof(int)));
+
+            foreach (var item in response)
+            {
+                if (item.State != null)
+                {
+                    var Id = Hue.HueController.Instance.GetLightIdbyName(item.Name);
+
+                    DataRow row = table.NewRow();
+                    row["ID"] = Id;
+                    row["Name"] = item.Name;
+                    row["ColorMode"] = item.State.Colormode;
+                    row["Bri"] = item.State.Bri;
+                    row["Hue"] = item.State.Hue;
+                    row["Sat"] = item.State.Sat;
+                    row["X"] = item.State.Xy[0];
+                    row["Y"] = item.State.Xy[1];
+                    row["Ct"] = item.State.Ct;
+                    table.Rows.Add(row);
+                }
+            }
+
+            dataSet.Tables.Add(table);
+
+            // DataGridに反映
+            LoadGridValuesFromTable(ref DataGrid_ColorSetting, dataSet.Tables["ColorSetting"]);
+
         }
     }
 }

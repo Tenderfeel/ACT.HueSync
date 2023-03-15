@@ -62,7 +62,12 @@ namespace ACT.HueSync
         {
             var param = PluginSetting.Instance.GetLightState();
             Label_Status.Text = PluginSetting.Instance.TimeZone;
-            Label_Status.Text += param.ToString();
+
+            if (param != null)
+            {
+                Label_Status.Text += param.ToString();
+            }
+            
         }
     }
 }

@@ -77,6 +77,23 @@ namespace ACT.HueSync.Hue
             }
         }
 
+        /// <summary>
+        /// ライト名からIDを返す
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string GetLightIdbyName(string name)
+        {
+           var config = LightConfigs.Find(x => x.Name == name);
+
+            if (config != null)
+            {
+                return config.Id;
+            }
+
+            return null;
+        }
+
 
         /// <summary>
         /// Bridgeに接続されている全ての照明機器を返す
@@ -105,6 +122,45 @@ namespace ACT.HueSync.Hue
             }
         }
 
+        /// <summary>
+        /// Enabledがtrueに設定されている全ライトのステータスを取得する
+        /// </summary>
+        /// <returns></returns>
+        public async Task<HueLight[]> GetLightState()
+        {
+            if (_lightConfigs == null || _lightConfigs.Count == 0)
+            {
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetLightState: NO Lights Setting");
+                return null;
+            }
+
+            try
+            {
+                var client = RestClientFactory();
+                var enabledConfigs = _lightConfigs.Where(config => config.Enabled).ToArray();
+                var tasks = new Task<HueLight>[enabledConfigs.Length];
+
+                for (var i = 0; i < enabledConfigs.Length; i++)
+                {
+                    var request = new RestRequest($"/api/{_appKey}/lights/{enabledConfigs[i].Id}", Method.Get);
+                    tasks[i] = client.GetAsync<HueLight>(request);
+                }
+
+                return await Task.WhenAll(tasks);
+
+            }
+            catch (Exception ex)
+            {
+                ActGlobals.oFormActMain.WriteExceptionLog(ex, ex.Message);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// ライトのステータスを設定する
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public async Task<List<PutResponse>[]> SetLightState(object param)
         {
             if (_lightConfigs == null || _lightConfigs.Count == 0)
@@ -149,7 +205,11 @@ namespace ACT.HueSync.Hue
                 return null;
             }
         }
-        
+
+        /// <summary>
+        /// https://discovery.meethue.comを利用してHue Bridgeを探す
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<HueBridgeInfo>> SearchHueBridge()
         {
 

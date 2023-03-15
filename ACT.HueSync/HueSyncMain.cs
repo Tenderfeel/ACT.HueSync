@@ -186,8 +186,8 @@ namespace ACT.HueSync
         {
             try
             {
-                var param = PluginSetting.Instance.GetLightState();
-                await hueController.SetLightState(param);
+                //var param = PluginSetting.Instance.GetLightState();
+                //await hueController.SetLightState(param);
 
             } catch (Exception ex)
             {

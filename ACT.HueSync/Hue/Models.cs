@@ -43,7 +43,7 @@ namespace ACT.HueSync.Hue
 
     public class PutSuccessResponse
     {
-        public Dictionary<string, int> Data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
     }
 
     public class PutResponse
@@ -53,6 +53,15 @@ namespace ACT.HueSync.Hue
 
         [JsonPropertyName("success")]
         public PutSuccessResponse Success { get; set; }
+    }
+
+    public class GetStateResponse
+    {
+        [JsonPropertyName("error")]
+        public RestError Error { get; set; }
+
+        [JsonPropertyName("success")]
+        public HueLight Success { get; set; }
     }
 
     public class RegisterResponse
