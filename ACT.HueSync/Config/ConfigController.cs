@@ -20,7 +20,7 @@ namespace ACT.HueSync.Config
         readonly ColorIndexForm colorIndexForm;
 
 
-        public ConfigController(string pluginDirectory)
+        public ConfigController()
         {
             configForm = new ConfigForm();
 
@@ -29,7 +29,6 @@ namespace ACT.HueSync.Config
             hueLightsForm = new HueLightsForm();
             limsaLominsaForm = new LimsaLominsaForm();
             colorIndexForm= new ColorIndexForm();
-
 
             configForm.Tree_MainMenu.AfterSelect += Tree_MainMenu_AfterSelect;
         }
@@ -47,6 +46,9 @@ namespace ACT.HueSync.Config
             switch (configForm.Tree_MainMenu.SelectedNode.Name)
             {
                 case "Hue_Setting":
+                    configForm.Panel_Content.Controls.Add(configIndexForm);
+                    break;
+
                 case "Hue_Initialize":
                     configForm.Panel_Content.Controls.Add(hueInitializeForm);
                     break;
@@ -56,8 +58,11 @@ namespace ACT.HueSync.Config
                     break;
 
                 case "Color_Setting":
-                case "Color_General":
+                case "Color_Import":
                     configForm.Panel_Content.Controls.Add(colorIndexForm);
+                    break;
+
+                case "Color_General":
                     break;
 
                 case "Color_LimsaLominsa":
@@ -75,19 +80,5 @@ namespace ACT.HueSync.Config
             pluginScreenSpace.Controls.Add(configForm);
         }
 
-        /// <summary>
-        /// サブクラスにSettingsSerializerを渡す
-        /// </summary>
-        /// <param name="xmlSettings"></param>
-        public void AddControlSetting(SettingsSerializer xmlSettings)
-        {
-            hueInitializeForm.AddControlSetting(xmlSettings);
-            hueLightsForm.AddControlSetting(xmlSettings);
-        }
-
-        public void AfterSettingLoaded()
-        {
-            hueLightsForm.AfterSettingLoaded();
-        }
     }
 }

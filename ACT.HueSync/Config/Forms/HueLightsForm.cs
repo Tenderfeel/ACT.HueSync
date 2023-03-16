@@ -15,17 +15,28 @@ using System.Xml.Linq;
 
 namespace ACT.HueSync.Config.Forms
 {
+    /// <summary>
+    /// ブリッジに接続中のライトをリストで表示する
+    /// チェックを入れたライトをコントロール対象にする
+    /// </summary>
     public partial class HueLightsForm : UserControl, IConfigForm
     {
         readonly Hue.HueController hueController;
 
+        /// <summary>
+        /// ライト一覧が空だった場合のフラグ
+        /// </summary>
         private bool _isEmptyConfig;
 
-
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public HueLightsForm()
         {
             InitializeComponent();
+
+            PluginSetting.Instance.GeneralDataInitialized += AddControlSetting;
+            PluginSetting.Instance.GeneralDataLoaded += AfterSettingLoaded;
 
             hueController = Hue.HueController.Instance;
 
@@ -35,13 +46,17 @@ namespace ACT.HueSync.Config.Forms
         /// <summary>
         /// 設定機能を追加する
         /// </summary>
-        /// <param name="xmlSettings">ACTのSettingsSerializer</param>
-        public void AddControlSetting(SettingsSerializer xmlSettings)
+        public void AddControlSetting(object sender, EventArgs e)
         {
-            xmlSettings.AddControlSetting(List_HueLights.Name, List_HueLights);
+            PluginSetting.Instance.GeneralData.AddControlSetting(List_HueLights.Name, List_HueLights);
         }
 
-        public void AfterSettingLoaded()
+        /// <summary>
+        /// GeneralData読み込み完了時のイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AfterSettingLoaded(object sender, EventArgs e)
         {
 
             _isEmptyConfig = List_HueLights.Items.Count == 0;
@@ -57,6 +72,9 @@ namespace ACT.HueSync.Config.Forms
             }
         }
 
+        /// <summary>
+        /// Bridgeに接続中のライトをリストにして表示する
+        /// </summary>
         private async void GetHueLights()
         {
             ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetHueLights Called.");
@@ -77,6 +95,7 @@ namespace ACT.HueSync.Config.Forms
 
             Label_GetLightsState.Text = "Loading...";
 
+            // 全てのライトを得る
             var result = await hueController.GetAllLights();
 
             if (result == null)
@@ -88,6 +107,7 @@ namespace ACT.HueSync.Config.Forms
 
             Label_GetLightsState.Text = $"{result.Count} found.";
 
+            // リストを作成
             var lightConfigs = new List<LightConfig>();
 
             foreach (var item in result)
@@ -123,6 +143,33 @@ namespace ACT.HueSync.Config.Forms
             }
 
             hueController.LightConfigs = lightConfigs;
+        }
+
+        /// <summary>
+        /// チェックボックスの状態が変更された時のイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void List_HueLights_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // チェックボックスの状態が変更されたアイテムのインデックスを取得
+            int itemIndex = e.Index;
+
+            if (hueController.LightConfigs == null)
+            {
+                return;
+            }
+
+            // チェックボックスがONになった場合
+            if (e.NewValue == CheckState.Checked)
+            {
+                hueController.LightConfigs[itemIndex].Enabled = true;
+            }
+            // チェックボックスがOFFになった場合
+            else if (e.NewValue == CheckState.Unchecked)
+            {
+                hueController.LightConfigs[itemIndex].Enabled = false;
+            }
         }
     }
 }

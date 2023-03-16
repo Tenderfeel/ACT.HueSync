@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Eorzea
 {
@@ -21,6 +22,65 @@ namespace Eorzea
         public static string WEATHER_UMBRAL_STATIC = "umbralStatic";
         public static string WEATHER_UMBRAL_WIND = "umbralWind";
         public static string WEATHER_WIND = "wind";
+
+        /// <summary>
+        /// 天気のIDリスト
+        /// </summary>
+        public static List<string> WeathersIdList = new List<string>() {
+            WEATHER_BLIZZARDS,
+            WEATHER_CLEAR_SKIES,
+            WEATHER_CLOUDS,
+            WEATHER_DUST_STORMS,
+            WEATHER_FAIR_SKIES,
+            WEATHER_FOG,
+            WEATHER_GALES,
+            WEATHER_GLOOM,
+            WEATHER_HEAT_WAVES,
+            WEATHER_RAIN,
+            WEATHER_SHOWERS,
+            WEATHER_SNOW,
+            WEATHER_THUNDER,
+            WEATHER_THUNDERSTORMS,
+            WEATHER_UMBRAL_STATIC,
+            WEATHER_UMBRAL_WIND,
+            WEATHER_WIND
+        };
+
+        public static Dictionary<string, string> WeatherId
+        {
+            get
+            {
+                string locale = "ja";
+                Dictionary<string, string> data = new Dictionary<string, string>();
+
+                foreach (var wid in WeathersIdList)
+                {
+                    // キャメルケース型の文字列を英語の表記に成型
+                    string outputString = System.Text.RegularExpressions.Regex.Replace(wid, @"(\p{Lu})", " $1").TrimStart();
+
+                    switch (locale)
+                    {
+                        case "ja":
+                            Locales.Ja.TryGetValue(wid, out var weatherLabel);
+                            if (weatherLabel != null)
+                            {
+                                data.Add(wid, weatherLabel);
+                            }
+                            else
+                            {
+                                data.Add(wid, outputString);
+                            }
+                            break;
+                        default:
+                            data.Add(wid, outputString);
+                            break;
+                    }
+                }
+
+                return data;
+            }
+        }
+        
 
         /// <summary>
         /// ACTのZoneIDをメソッド名に置換するための

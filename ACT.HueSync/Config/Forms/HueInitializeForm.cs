@@ -27,6 +27,8 @@ namespace ACT.HueSync.Config.Forms
         {
             InitializeComponent();
 
+            PluginSetting.Instance.GeneralDataInitialized += AddControlSetting;
+
             hueController = Hue.HueController.Instance;
             Label_ReClick.Visible = false;
         }
@@ -34,13 +36,12 @@ namespace ACT.HueSync.Config.Forms
         /// <summary>
         /// 設定機能を追加する
         /// </summary>
-        /// <param name="xmlSettings">ACTのSettingsSerializer</param>
-        public void AddControlSetting(SettingsSerializer xmlSettings)
+        public void AddControlSetting(object sender, EventArgs e)
         {
             // Add any controls you want to save the state of
-            xmlSettings.AddControlSetting(Text_BridgeId.Name, Text_BridgeId);
-            xmlSettings.AddControlSetting(Text_IpAddress.Name, Text_IpAddress);
-            xmlSettings.AddControlSetting(Text_HueAppKey.Name, Text_HueAppKey);
+            PluginSetting.Instance.GeneralData.AddControlSetting(Text_BridgeId.Name, Text_BridgeId);
+            PluginSetting.Instance.GeneralData.AddControlSetting(Text_IpAddress.Name, Text_IpAddress);
+            PluginSetting.Instance.GeneralData.AddControlSetting(Text_HueAppKey.Name, Text_HueAppKey);
 
             Label_SearchInfo.Text = GetSearchInfoText();
 

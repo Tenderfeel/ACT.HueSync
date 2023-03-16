@@ -79,10 +79,10 @@
   <ItemGroup>
     <Compile Include="ActPlugin.cs" />
     <Compile Include="Config\ConfigController.cs" />
-    <Compile Include="Config\Forms\ColorIndexForm.cs">
+    <Compile Include="Config\Forms\Color\ColorIndexForm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Config\Forms\ColorIndexForm.Designer.cs">
+    <Compile Include="Config\Forms\Color\ColorIndexForm.Designer.cs">
       <DependentUpon>ColorIndexForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\Forms\ConfigIndexForm.cs">
@@ -104,10 +104,10 @@
       <DependentUpon>HueLightsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\Forms\IConfigForm.cs" />
-    <Compile Include="Config\Forms\LimsaLominsaForm.cs">
+    <Compile Include="Config\Forms\Color\LimsaLominsaForm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Config\Forms\LimsaLominsaForm.Designer.cs">
+    <Compile Include="Config\Forms\Color\LimsaLominsaForm.Designer.cs">
       <DependentUpon>LimsaLominsaForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Eorzea\Constants.cs" />
@@ -143,7 +143,7 @@
     <EmbeddedResource Include="Config\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Config\Forms\ColorIndexForm.resx">
+    <EmbeddedResource Include="Config\Forms\Color\ColorIndexForm.resx">
       <DependentUpon>ColorIndexForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\Forms\ConfigIndexForm.resx">
@@ -155,7 +155,7 @@
     <EmbeddedResource Include="Config\Forms\HueLightsForm.resx">
       <DependentUpon>HueLightsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Config\Forms\LimsaLominsaForm.resx">
+    <EmbeddedResource Include="Config\Forms\Color\LimsaLominsaForm.resx">
       <DependentUpon>LimsaLominsaForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OverlayForm.resx">

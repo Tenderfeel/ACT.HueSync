@@ -15,6 +15,7 @@ namespace ACT.HueSync
         {
             InitializeComponent();
             hueController = Hue.HueController.Instance;
+            this.Dock= DockStyle.Fill;
 
             hueController.ConfigLoaded += HandleLightsConfigLoaded;
         }

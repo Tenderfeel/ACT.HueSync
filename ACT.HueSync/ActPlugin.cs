@@ -40,7 +40,7 @@ namespace ACT.HueSync
 
             PluginSetting.Instance.PluginDirectory = pluginDirectory;
 
-            hueSyncMain = new HueSyncMain(pluginDirectory);
+            hueSyncMain = new HueSyncMain();
             hueSyncMain.Init( pluginScreenSpace, pluginStatusText );
 
             lblStatus.Text = "Plugin Started";

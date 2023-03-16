@@ -15,6 +15,22 @@ namespace ACT.HueSync.Config.Forms
         public LimsaLominsaForm()
         {
             InitializeComponent();
+            this.Dock = DockStyle.Fill;
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void splitContainer1_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+
+        }
+
+        private void DataGrid_LimsaLominsa_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

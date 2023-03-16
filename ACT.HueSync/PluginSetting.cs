@@ -1,8 +1,10 @@
 ﻿using ACT.HueSync.Hue;
+using Advanced_Combat_Tracker;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +18,22 @@ namespace ACT.HueSync
 
         private double _currentET;
         private string _timeZone;
+        private SettingsSerializer _generalData;
+
+        /// <summary>
+        /// GeneralData読み込み時に発火するイベント
+        /// </summary>
+        public event EventHandler GeneralDataLoaded;
+
+        /// <summary>
+        /// GeneralData初期化時に発火するイベント
+        /// </summary>
+        public event EventHandler GeneralDataInitialized;
+
+        /// <summary>
+        /// GeneralDataファイルの場所
+        /// </summary>
+        public readonly string GeneralDataFileName = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\ActHueSync.config.xml");
 
         PluginSetting()
         {
@@ -36,6 +54,26 @@ namespace ACT.HueSync
             }
         }
 
+        /// <summary>
+        /// プラグイン設定
+        /// </summary>
+        public SettingsSerializer GeneralData 
+        { 
+            set
+            {
+                _generalData = value;
+                ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GeneralData Initialized.");
+                GeneralDataInitialized.Invoke(this, EventArgs.Empty);
+            }
+            get
+            {
+                return _generalData;
+            }
+        }
+
+        /// <summary>
+        /// プラグインのディレクトリ
+        /// </summary>
         public string PluginDirectory { set; get; }
 
         public double CurrentET { 
@@ -100,6 +138,14 @@ namespace ACT.HueSync
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// GeneralData読み込み時に叩かれる
+        /// </summary>
+        public void InvokeGeneralDataLoaded()
+        {
+            GeneralDataLoaded.Invoke(this, EventArgs.Empty);
         }
     }
 }

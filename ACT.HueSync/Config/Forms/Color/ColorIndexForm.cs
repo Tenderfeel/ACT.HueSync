@@ -14,6 +14,8 @@ using ACT.HueSync.Hue;
 using Advanced_Combat_Tracker;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Collections;
 
 namespace ACT.HueSync.Config.Forms
 {
@@ -30,6 +32,23 @@ namespace ACT.HueSync.Config.Forms
             InitializeComponent();
 
             dataSet = new DataSet();
+
+            Dictionary<string, string> defaultDictionary = new Dictionary<string, string>()
+            {
+                { "", "" }
+            };
+
+            // Dictionaryを複製する
+            Dictionary<string, string> clonedZoneDictionary = defaultDictionary.Concat(Eorzea.Constants.ZoneId).ToDictionary(pair => pair.Key, pair => pair.Value);
+            Dictionary<string, string> clonedWeatherDictionary = defaultDictionary.Concat(Eorzea.Constants.WeatherId).ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            ComboBox_ZoneName.DataSource = new BindingSource(clonedZoneDictionary, null);
+            ComboBox_ZoneName.DisplayMember = "Key";
+            ComboBox_ZoneName.ValueMember = "Value";
+
+            ComboBox_Weather.DataSource = new BindingSource(clonedWeatherDictionary, null);
+            ComboBox_Weather.DisplayMember = "Value";
+            ComboBox_Weather.ValueMember = "Key";
 
             // LoadData();
             // DataGrid_ColorSetting.DataBindingComplete += DataGrid_ColorSetting_DataBindingComplete;

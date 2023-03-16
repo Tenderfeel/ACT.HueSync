@@ -15,9 +15,6 @@ namespace ACT.HueSync
 {
     internal class HueSyncMain
     {
-        private readonly string settingsFile = Path.Combine(ActGlobals.oFormActMain.AppDataFolder.FullName, "Config\\ActHueSync.config.xml");
-
-        SettingsSerializer xmlSettings;
 
         readonly ListBox log; // for log display
         readonly OverlayForm overlay; // overlay window
@@ -33,15 +30,12 @@ namespace ACT.HueSync
         Label lblStatus;    // The status label that appears in ACT's Plugin tab
         TabPage pluginScreen;
 
-        readonly private string _pluginDirectory;
-
         readonly Hue.HueController hueController;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public HueSyncMain(string pluginDirectory) {
-            _pluginDirectory = pluginDirectory;
+        public HueSyncMain() {
 
             // List box for log display
             log = new ListBox
@@ -74,7 +68,7 @@ namespace ACT.HueSync
                 }
             };
 
-            configController = new Config.ConfigController(pluginDirectory);
+            configController = new Config.ConfigController();
 
             hueController = Hue.HueController.Instance;
             hueController.ConfigLoaded += HandleLightsConfigLoaded;
@@ -93,7 +87,7 @@ namespace ACT.HueSync
 
             pluginScreen.Text = "HueSync";
 
-            xmlSettings = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
+            PluginSetting.Instance.GeneralData = new SettingsSerializer(this); // Create a new settings serializer and pass it this instance
             LoadSettings();
 
             overlay.Show();
@@ -182,7 +176,7 @@ namespace ACT.HueSync
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void HandleLightsConfigLoaded(object sender, EventArgs e)
+        private  void HandleLightsConfigLoaded(object sender, EventArgs e)
         {
             try
             {
@@ -218,11 +212,10 @@ namespace ACT.HueSync
         /// </summary>
         private void LoadSettings()
         {
-            configController.AddControlSetting(xmlSettings);
 
-            if (File.Exists(settingsFile))
+            if (File.Exists(PluginSetting.Instance.GeneralDataFileName))
             {
-                FileStream fs = new FileStream(settingsFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                FileStream fs = new FileStream(PluginSetting.Instance.GeneralDataFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 XmlTextReader xReader = new XmlTextReader(fs);
 
                 try
@@ -233,18 +226,18 @@ namespace ACT.HueSync
                         {
                             if (xReader.LocalName == "SettingsSerializer")
                             {
-                                xmlSettings.ImportFromXml(xReader);
+                                PluginSetting.Instance.GeneralData.ImportFromXml(xReader);
                             }
                         }
                     }
+
+                    PluginSetting.Instance.InvokeGeneralDataLoaded();
                 }
                 catch (Exception ex)
                 {
                     lblStatus.Text = "Error loading settings: " + ex.Message;
                 }
                 xReader.Close();
-
-                configController.AfterSettingLoaded();
             }
         }
 
@@ -253,7 +246,7 @@ namespace ACT.HueSync
         /// </summary>
         private void SaveSettings()
         {
-            FileStream fs = new FileStream(settingsFile, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            FileStream fs = new FileStream(PluginSetting.Instance.GeneralDataFileName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             XmlTextWriter xWriter = new XmlTextWriter(fs, Encoding.UTF8)
             {
                 Formatting = Formatting.Indented,
@@ -263,7 +256,7 @@ namespace ACT.HueSync
             xWriter.WriteStartDocument(true);
             xWriter.WriteStartElement("Config");    // <Config>
             xWriter.WriteStartElement("SettingsSerializer");    // <Config><SettingsSerializer>
-            xmlSettings.ExportToXml(xWriter);   // Fill the SettingsSerializer XML
+            PluginSetting.Instance.GeneralData.ExportToXml(xWriter);   // Fill the SettingsSerializer XML
             xWriter.WriteEndElement();  // </SettingsSerializer>
             xWriter.WriteEndElement();  // </Config>
             xWriter.WriteEndDocument(); // Tie up loose ends (shouldn't be any)

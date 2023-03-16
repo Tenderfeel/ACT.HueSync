@@ -31,9 +31,9 @@
             this.Label_GetLightsState = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.List_HueLights = new System.Windows.Forms.CheckedListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.List_HueLights = new System.Windows.Forms.CheckedListBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -67,14 +67,6 @@
             this.panel2.Size = new System.Drawing.Size(700, 374);
             this.panel2.TabIndex = 5;
             // 
-            // List_HueLights
-            // 
-            this.List_HueLights.FormattingEnabled = true;
-            this.List_HueLights.Location = new System.Drawing.Point(15, 0);
-            this.List_HueLights.Name = "List_HueLights";
-            this.List_HueLights.Size = new System.Drawing.Size(334, 214);
-            this.List_HueLights.TabIndex = 0;
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.label1);
@@ -93,6 +85,15 @@
             this.label1.Size = new System.Drawing.Size(248, 12);
             this.label1.TabIndex = 0;
             this.label1.Text = "Check the lights to be linked to the application.";
+            // 
+            // List_HueLights
+            // 
+            this.List_HueLights.FormattingEnabled = true;
+            this.List_HueLights.Location = new System.Drawing.Point(15, 0);
+            this.List_HueLights.Name = "List_HueLights";
+            this.List_HueLights.Size = new System.Drawing.Size(334, 214);
+            this.List_HueLights.TabIndex = 0;
+            this.List_HueLights.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.List_HueLights_ItemCheck);
             // 
             // HueLightsForm
             // 
