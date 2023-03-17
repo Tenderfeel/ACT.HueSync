@@ -80,7 +80,7 @@ namespace Eorzea
                 return data;
             }
         }
-        
+
 
         /// <summary>
         /// ACTのZoneIDをメソッド名に置換するための

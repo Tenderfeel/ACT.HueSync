@@ -22,6 +22,7 @@ namespace ACT.HueSync
 
         private async void Btn_Enabled_Click(object sender, EventArgs e)
         {
+            /*
             Label_Status.Text = "Loading..";
 
             var param = PluginSetting.Instance.GetLightState();
@@ -55,19 +56,20 @@ namespace ACT.HueSync
                 });
             }
 
-
+            */
             
         }
 
         private void HandleLightsConfigLoaded( object sender, EventArgs e)
         {
+            /*
             var param = PluginSetting.Instance.GetLightState();
             Label_Status.Text = PluginSetting.Instance.TimeZone;
 
             if (param != null)
             {
                 Label_Status.Text += param.ToString();
-            }
+            }*/
             
         }
     }

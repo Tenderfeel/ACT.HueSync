@@ -28,18 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Hue Bridge Initialize");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("Lights");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Hue Setting", new System.Windows.Forms.TreeNode[] {
-            treeNode8,
-            treeNode9});
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Import");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("General");
-            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Limsa Lominsa");
-            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("Color Setting", new System.Windows.Forms.TreeNode[] {
-            treeNode11,
-            treeNode12,
-            treeNode13});
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Hue Bridge Initialize");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Lights");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Hue Setting", new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2});
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Import");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("General");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Limsa Lominsa");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Color Setting", new System.Windows.Forms.TreeNode[] {
+            treeNode4,
+            treeNode5,
+            treeNode6});
             this.Tree_MainMenu = new System.Windows.Forms.TreeView();
             this.Panel_Content = new System.Windows.Forms.Panel();
             this.Label_Status = new System.Windows.Forms.Label();
@@ -57,25 +57,25 @@
             this.Tree_MainMenu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Tree_MainMenu.Location = new System.Drawing.Point(0, 0);
             this.Tree_MainMenu.Name = "Tree_MainMenu";
-            treeNode8.Name = "Hue_Initialize";
-            treeNode8.Text = "Hue Bridge Initialize";
-            treeNode8.ToolTipText = "初期設定";
-            treeNode9.Name = "Hue_Lights";
-            treeNode9.Text = "Lights";
-            treeNode9.ToolTipText = "連携するライトを選択";
-            treeNode10.Name = "Hue_Setting";
-            treeNode10.Text = "Hue Setting";
-            treeNode11.Name = "Color_Import";
-            treeNode11.Text = "Import";
-            treeNode12.Name = "Color_General";
-            treeNode12.Text = "General";
-            treeNode13.Name = "Color_LimsaLominsa";
-            treeNode13.Text = "Limsa Lominsa";
-            treeNode14.Name = "Color_Setting";
-            treeNode14.Text = "Color Setting";
+            treeNode1.Name = "Hue_Initialize";
+            treeNode1.Text = "Hue Bridge Initialize";
+            treeNode1.ToolTipText = "初期設定";
+            treeNode2.Name = "Hue_Lights";
+            treeNode2.Text = "Lights";
+            treeNode2.ToolTipText = "連携するライトを選択";
+            treeNode3.Name = "Hue_Setting";
+            treeNode3.Text = "Hue Setting";
+            treeNode4.Name = "Color_Import";
+            treeNode4.Text = "Import";
+            treeNode5.Name = "Color_General";
+            treeNode5.Text = "General";
+            treeNode6.Name = "Color_LimsaLominsa";
+            treeNode6.Text = "Limsa Lominsa";
+            treeNode7.Name = "Color_Setting";
+            treeNode7.Text = "Color Setting";
             this.Tree_MainMenu.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode10,
-            treeNode14});
+            treeNode3,
+            treeNode7});
             this.Tree_MainMenu.Size = new System.Drawing.Size(147, 415);
             this.Tree_MainMenu.TabIndex = 14;
             // 

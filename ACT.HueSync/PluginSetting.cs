@@ -20,6 +20,12 @@ namespace ACT.HueSync
         private string _timeZone;
         private SettingsSerializer _generalData;
 
+        readonly private DataTable _colorDataTable = new DataTable("ColorData");
+        readonly private DataTable _lightDataTable = new DataTable("LightData");
+        readonly private DataSet _colorSettingDataSet = new DataSet();
+
+        public event EventHandler ColorDataTableChanged;
+
         /// <summary>
         /// GeneralData読み込み時に発火するイベント
         /// </summary>
@@ -37,6 +43,44 @@ namespace ACT.HueSync
 
         PluginSetting()
         {
+            _colorDataTable.Columns.Add("ColorID", typeof(string));
+            _colorDataTable.Columns.Add("ZoneName", typeof(string));
+            _colorDataTable.Columns.Add("StartTime", typeof(decimal));
+            _colorDataTable.Columns.Add("WeatherId", typeof(string));
+
+            //主キーの設定
+            _colorDataTable.PrimaryKey = new DataColumn[] { 
+                _colorDataTable.Columns["ColorID"] 
+            };
+
+            _colorDataTable.RowChanged += ColorDataTable_RowChanged;
+
+            _lightDataTable.Columns.Add("ColorId", typeof(string));
+            _lightDataTable.Columns.Add("LightId", typeof(int));
+            _lightDataTable.Columns.Add("LightName", typeof(string));
+            _lightDataTable.Columns.Add("ColorMode", typeof(string));
+            _lightDataTable.Columns.Add("Bri", typeof(int));
+            _lightDataTable.Columns.Add("Hue", typeof(int));
+            _lightDataTable.Columns.Add("Sat", typeof(int));
+            _lightDataTable.Columns.Add("X", typeof(int));
+            _lightDataTable.Columns.Add("Y", typeof(int));
+            _lightDataTable.Columns.Add("Ct", typeof(int));
+
+            _colorSettingDataSet.Tables.Add(_colorDataTable);
+            _colorSettingDataSet.Tables.Add(_lightDataTable);
+
+            // リレーションの設定
+            DataRelation Datatablerelation = new DataRelation("LightsDetail",
+                    _colorSettingDataSet.Tables["ColorData"].Columns["ColorId"], 
+                    _colorSettingDataSet.Tables["LightData"].Columns["ColorId"], 
+                    true);
+            
+            _colorSettingDataSet.Relations.Add(Datatablerelation);
+        }
+
+        private void ColorDataTable_RowChanged(object sender, DataRowChangeEventArgs e)
+        {
+            ColorDataTableChanged.Invoke(this, EventArgs.Empty);
         }
 
         public static PluginSetting Instance
@@ -111,8 +155,37 @@ namespace ACT.HueSync
 
         public string CurrentZoneName { set; get; }
 
-        public DataTable GeneralColorSetting { get; set; }
+        /// <summary>
+        /// ColorId, StartTime, ZoneId, WeatherId
+        /// </summary>
+        public DataTable ColorDataTable { 
+            get {
+                return _colorDataTable;
+            }
+        }
 
+        /// <summary>
+        /// ColorId, LightId, LightName, ...LightState
+        /// </summary>
+        public DataTable LightDataTable
+        {
+            get
+            {
+                return _lightDataTable;
+            }
+        }
+
+        /// <summary>
+        /// ColorDataTable + LightDataTable (Relation)
+        /// </summary>
+        public DataSet ColorSettingDataSet
+        {
+            get
+            {
+                return _colorSettingDataSet;
+            }
+        }
+        /*
         public object GetLightState()
         {
             if (GeneralColorSetting == null)
@@ -138,7 +211,7 @@ namespace ACT.HueSync
             }
 
             return null;
-        }
+        }*/
 
         /// <summary>
         /// GeneralData読み込み時に叩かれる

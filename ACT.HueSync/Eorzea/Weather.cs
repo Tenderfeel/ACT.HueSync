@@ -36,7 +36,6 @@ namespace Eorzea
                 return "Unknown";
             }
 
-
             Type type = typeof(WeatherChance);
             MethodInfo methodInfo = type.GetMethod(zoneId);
 

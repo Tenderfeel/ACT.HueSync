@@ -129,16 +129,16 @@ namespace ACT.HueSync
 
         private void DisplayUpdate()
         {
-            string zone = ActGlobals.oFormActMain.CurrentZone;
+            string zoneName = ActGlobals.oFormActMain.CurrentZone;
             DateTime time = ActGlobals.oFormActMain.LastKnownTime;
             var currentET = eorzeaClock.GetCurrentET(time);
-            string currentWeather = eorzeaWeather.GetWeather(zone);
+            string currentWeather = eorzeaWeather.GetWeather(zoneName);
 
             PluginSetting.Instance.CurrentWeather = currentWeather;
             PluginSetting.Instance.CurrentET = currentET["hour"];
-            PluginSetting.Instance.CurrentZoneName = zone;
+            PluginSetting.Instance.CurrentZoneName = zoneName;
 
-            Info($"{zone} [ET]{currentET["hour"]}:{currentET["min"]} -- {currentWeather}");
+            Info($"{zoneName} [ET]{currentET["hour"]}:{currentET["min"]} -- {currentWeather}");
         }
 
         /// <summary>

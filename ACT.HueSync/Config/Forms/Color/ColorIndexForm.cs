@@ -16,6 +16,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Collections;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace ACT.HueSync.Config.Forms
 {
@@ -26,26 +27,36 @@ namespace ACT.HueSync.Config.Forms
         List<Hue.ColorSetting> colorSettings;
         const string FileName = @"ColorData\General.xml";
         DataSet dataSet;
+        Guid _guid;
 
         public ColorIndexForm()
         {
             InitializeComponent();
+            this.Dock = DockStyle.Fill;
 
             dataSet = new DataSet();
+
 
             Dictionary<string, string> defaultDictionary = new Dictionary<string, string>()
             {
                 { "", "" }
             };
 
+            Dictionary<string, string> defaultZoneDictionary = new Dictionary<string, string>()
+            {
+                { "General", "" }
+            };
+
             // Dictionaryを複製する
-            Dictionary<string, string> clonedZoneDictionary = defaultDictionary.Concat(Eorzea.Constants.ZoneId).ToDictionary(pair => pair.Key, pair => pair.Value);
+            Dictionary<string, string> clonedZoneDictionary = defaultZoneDictionary.Concat(Eorzea.Constants.ZoneId).ToDictionary(pair => pair.Key, pair => pair.Value);
             Dictionary<string, string> clonedWeatherDictionary = defaultDictionary.Concat(Eorzea.Constants.WeatherId).ToDictionary(pair => pair.Key, pair => pair.Value);
 
+            // ゾーン名
             ComboBox_ZoneName.DataSource = new BindingSource(clonedZoneDictionary, null);
             ComboBox_ZoneName.DisplayMember = "Key";
-            ComboBox_ZoneName.ValueMember = "Value";
+            ComboBox_ZoneName.ValueMember = "Key";
 
+            // 天気
             ComboBox_Weather.DataSource = new BindingSource(clonedWeatherDictionary, null);
             ComboBox_Weather.DisplayMember = "Value";
             ComboBox_Weather.ValueMember = "Key";
@@ -147,21 +158,21 @@ namespace ACT.HueSync.Config.Forms
             int rowIndex = 0;
             int dataIndex = 0;
 
-            DataGrid_ColorSetting.SuspendLayout();
+            DataGrid_LightSetting.SuspendLayout();
 
-            foreach (DataGridViewRow row in DataGrid_ColorSetting.Rows)
+            foreach (DataGridViewRow row in DataGrid_LightSetting.Rows)
             {
                 int columnIndex = 0;
 
-                foreach (DataGridViewColumn column in DataGrid_ColorSetting.Columns)
+                foreach (DataGridViewColumn column in DataGrid_LightSetting.Columns)
                 {
                     // ヘッダー行でなく、かつヘッダー名が"Color"の場合のみ処理を実行
-                    if (rowIndex >= 0 && DataGrid_ColorSetting.Columns[columnIndex].HeaderText == "Color")
+                    if (rowIndex >= 0 && DataGrid_LightSetting.Columns[columnIndex].HeaderText == "Color")
                     {
 
                         var val = colorSettings[dataIndex].Color;
                         // ActGlobals.oFormActMain.WriteInfoLog($"[HueSync]rowIndex:{rowIndex}  columnIndex:{columnIndex} value:{DataGrid_ColorSetting.Rows[rowIndex].Cells[columnIndex].Value}==={val}");
-                        DataGrid_ColorSetting.Rows[rowIndex].Cells[columnIndex].Style.BackColor = Util.RGBstringToColor(val);
+                        DataGrid_LightSetting.Rows[rowIndex].Cells[columnIndex].Style.BackColor = Util.RGBstringToColor(val);
                     }
 
                     columnIndex++;
@@ -171,10 +182,9 @@ namespace ACT.HueSync.Config.Forms
                 dataIndex++;
             }
 
-            DataGrid_ColorSetting.ResumeLayout();
+            DataGrid_LightSetting.ResumeLayout();
 
         }
-
 
         private void LoadData()
         {
@@ -185,9 +195,9 @@ namespace ACT.HueSync.Config.Forms
                 dataSet.ReadXml(PluginSetting.Instance.PluginDirectory + @"\" + FileName);
 
                 // SetLoadData(BSTable);
-                LoadGridValuesFromTable(ref DataGrid_ColorSetting, dataSet.Tables["ColorSetting"]);
+                LoadGridValuesFromTable(ref DataGrid_LightSetting, dataSet.Tables["ColorSetting"]);
 
-                PluginSetting.Instance.GeneralColorSetting = dataSet.Tables["ColorSetting"];
+                //PluginSetting.Instance.GeneralColorSetting = dataSet.Tables["ColorSetting"];
 
             } catch (Exception ex)
             {
@@ -283,13 +293,16 @@ namespace ACT.HueSync.Config.Forms
                 return;
             }
 
+            // GUID update
+            _guid = Guid.NewGuid();
+
             Label_GetStateInfo.Text = $"{response.Count()} found";
 
             Panel_Trigger.Visible = true;
 
-            dataSet.Clear();
+            dataSet.Tables.Clear();
 
-            DataTable table = new DataTable("ColorSetting");
+            DataTable table = new DataTable("LightSetting");
 
             table.Columns.Add(new DataColumn("ID", typeof(string)));
             table.Columns.Add(new DataColumn("Name", typeof(string)));
@@ -324,8 +337,82 @@ namespace ACT.HueSync.Config.Forms
             dataSet.Tables.Add(table);
 
             // DataGridに反映
-            LoadGridValuesFromTable(ref DataGrid_ColorSetting, dataSet.Tables["ColorSetting"]);
+            LoadGridValuesFromTable(ref DataGrid_LightSetting, dataSet.Tables["LightSetting"]);
 
+        }
+
+        /// <summary>
+        /// 設定を保存する
+        /// </summary>
+        /// <param name="sender"></param>   
+        /// <param name="e"></param>
+        private void Btn_SaveColorSetting_Click(object sender, EventArgs e)
+        {
+
+            if (UpDown_StartTime.Value == -1 && ComboBox_Weather.SelectedValue.ToString() == "")
+            {
+                Label_SaveSetting.Text = "Requied StartTime or Weather.";
+                return;
+            }
+
+            string uniqid = _guid.ToString("N");
+            string zoneName = ComboBox_ZoneName.SelectedValue.ToString();
+            decimal startTime = UpDown_StartTime.Value;
+            string weatherId = ComboBox_Weather.SelectedValue.ToString();
+
+            // ZoneName, StartTime, WeatherIdの値が一致する行を検索する
+            var foundRows = from DataRow row in PluginSetting.Instance.ColorDataTable.Rows
+                            where (string)row["ZoneName"] == zoneName
+                            && (decimal)row["StartTime"] == startTime
+                            && (string)row["WeatherId"] == weatherId
+                            select row;
+
+            // 該当する行が存在する
+            if (foundRows.Any())
+             {
+                Label_SaveSetting.Text = "Settings with the same conditions are registered.";
+                return;
+            }
+
+             Label_SaveSetting.Text = "";
+
+            try
+            {
+                // Color設定テーブルに追加
+                PluginSetting.Instance.ColorDataTable.Rows.Add(
+                    uniqid,
+                    zoneName,
+                    startTime,
+                    weatherId
+                );
+            } catch
+            {
+                // 主キーが重複している
+                Label_SaveSetting.Text = $"{uniqid} is already registered.";
+                return;
+            }
+
+
+            DataTable table = dataSet.Tables["LightSetting"];
+
+            // Light設定テーブルに追加
+            foreach (DataRow row in table.Rows)
+            {
+                PluginSetting.Instance.LightDataTable.Rows.Add(
+                    uniqid,
+                    row["ID"],
+                    row["Name"],
+                    row["ColorMode"],
+                    row["Bri"],
+                    row["Hue"],
+                    row["Sat"],
+                    row["X"],
+                    row["Y"],
+                    row["Ct"]
+                );
+            }
+
+            Label_SaveSetting.Text = "Saved!";
         }
     }
 }
