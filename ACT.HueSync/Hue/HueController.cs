@@ -138,15 +138,20 @@ namespace ACT.HueSync.Hue
             {
                 var client = RestClientFactory();
                 var enabledConfigs = _lightConfigs.Where(config => config.Enabled).ToArray();
-                var tasks = new Task<HueLight>[enabledConfigs.Length];
+                // Taskだとエラーがでる
+                //var tasks = new Task<HueLight>[enabledConfigs.Length];
+                var result = new HueLight[enabledConfigs.Length];
 
                 for (var i = 0; i < enabledConfigs.Length; i++)
                 {
-                    var request = new RestRequest($"/api/{_appKey}/lights/{enabledConfigs[i].Id}", Method.Get);
-                    tasks[i] = client.GetAsync<HueLight>(request);
+                    // var request = new RestRequest($"/api/{_appKey}/lights/{enabledConfigs[i].Id}", Method.Get);
+                    //tasks[i] = client.GetAsync<HueLight>(request);
+                    result[i] = await client.GetJsonAsync<HueLight>($"/api/{_appKey}/lights/{enabledConfigs[i].Id}");
+
                 }
 
-                return await Task.WhenAll(tasks);
+                //return await Task.WhenAll(tasks);
+               return result;
 
             }
             catch (Exception ex)

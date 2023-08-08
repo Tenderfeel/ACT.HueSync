@@ -27,6 +27,7 @@ namespace ACT.HueSync.Config.Forms
         List<Hue.ColorSetting> colorSettings;
         const string FileName = @"ColorData\General.xml";
         DataSet dataSet;
+        DataTable LightSettingTable;
         Guid _guid;
 
         public ColorIndexForm()
@@ -35,7 +36,19 @@ namespace ACT.HueSync.Config.Forms
             this.Dock = DockStyle.Fill;
 
             dataSet = new DataSet();
+            LightSettingTable = new DataTable("LightSetting");
 
+            LightSettingTable.Columns.Add(new DataColumn("ID", typeof(string)));
+            LightSettingTable.Columns.Add(new DataColumn("Name", typeof(string)));
+            LightSettingTable.Columns.Add(new DataColumn("ColorMode", typeof(string)));
+            LightSettingTable.Columns.Add(new DataColumn("Bri", typeof(int)));
+            LightSettingTable.Columns.Add(new DataColumn("Hue", typeof(int)));
+            LightSettingTable.Columns.Add(new DataColumn("Sat", typeof(int)));
+            LightSettingTable.Columns.Add(new DataColumn("X", typeof(float)));
+            LightSettingTable.Columns.Add(new DataColumn("Y", typeof(float)));
+            LightSettingTable.Columns.Add(new DataColumn("Ct", typeof(int)));
+
+            dataSet.Tables.Add(LightSettingTable);
 
             Dictionary<string, string> defaultDictionary = new Dictionary<string, string>()
             {
@@ -218,6 +231,7 @@ namespace ACT.HueSync.Config.Forms
         private void LoadGridValuesFromTable(ref DataGridView dv, DataTable data)
         {
 
+            dv.Rows.Clear();
             dv.SuspendLayout();
 
             foreach (DataColumn column in data.Columns)
@@ -276,12 +290,13 @@ namespace ACT.HueSync.Config.Forms
 
             Label_GetStateInfo.Text = "Wait...";
             Panel_Trigger.Visible = false;
+            LightSettingTable.Rows.Clear();
 
             var response = await Hue.HueController.Instance.GetLightState();
 
             if (response == null)
             {
-                Label_GetStateInfo.Text = "Error!";
+                Label_GetStateInfo.Text = "Error! No Response.";
                 ActGlobals.oFormActMain.WriteInfoLog("[HueSync] GetLightState, result is null.");
                 return;
             }
@@ -296,23 +311,11 @@ namespace ACT.HueSync.Config.Forms
             // GUID update
             _guid = Guid.NewGuid();
 
+
             Label_GetStateInfo.Text = $"{response.Count()} found";
 
             Panel_Trigger.Visible = true;
 
-            dataSet.Tables.Clear();
-
-            DataTable table = new DataTable("LightSetting");
-
-            table.Columns.Add(new DataColumn("ID", typeof(string)));
-            table.Columns.Add(new DataColumn("Name", typeof(string)));
-            table.Columns.Add(new DataColumn("ColorMode", typeof(string)));
-            table.Columns.Add(new DataColumn("Bri", typeof(int)));
-            table.Columns.Add(new DataColumn("Hue", typeof(int)));
-            table.Columns.Add(new DataColumn("Sat", typeof(int)));
-            table.Columns.Add(new DataColumn("X", typeof(float)));
-            table.Columns.Add(new DataColumn("Y", typeof(float)));
-            table.Columns.Add(new DataColumn("Ct", typeof(int)));
 
             foreach (var item in response)
             {
@@ -320,7 +323,7 @@ namespace ACT.HueSync.Config.Forms
                 {
                     var Id = Hue.HueController.Instance.GetLightIdbyName(item.Name);
 
-                    DataRow row = table.NewRow();
+                    DataRow row = LightSettingTable.NewRow();
                     row["ID"] = Id;
                     row["Name"] = item.Name;
                     row["ColorMode"] = item.State.Colormode;
@@ -330,14 +333,12 @@ namespace ACT.HueSync.Config.Forms
                     row["X"] = item.State.Xy[0];
                     row["Y"] = item.State.Xy[1];
                     row["Ct"] = item.State.Ct;
-                    table.Rows.Add(row);
+                    LightSettingTable.Rows.Add(row);
                 }
             }
 
-            dataSet.Tables.Add(table);
-
             // DataGridに反映
-            LoadGridValuesFromTable(ref DataGrid_LightSetting, dataSet.Tables["LightSetting"]);
+            LoadGridValuesFromTable(ref DataGrid_LightSetting, this.dataSet.Tables["LightSetting"]);
 
         }
 
